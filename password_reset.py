@@ -1,4 +1,4 @@
-```python
+
 from flask import Blueprint, request
 from werkzeug.security import generate_password_hash
 
@@ -718,4 +718,4 @@ def reset_password():
 # ==========================================
 
 create_reset_table()
-```
+
