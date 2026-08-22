@@ -1,59 +1,130 @@
-import sqlite3
+import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
+
+# ==========================================
+# POSTGRESQL DATABASE
+# ==========================================
+
+def get_database():
+
+    database_url = os.getenv("DATABASE_URL")
+
+    if not database_url:
+        raise RuntimeError(
+            "DATABASE_URL environment variable topilmadi!"
+        )
+
+    connection = psycopg2.connect(
+        database_url,
+        cursor_factory=RealDictCursor
+    )
+
+    return connection
+
+
+# ==========================================
+# CREATE TABLES
+# ==========================================
 
 def create_database():
-    connection = sqlite3.connect("vocabulary.db")
+
+    connection = get_database()
 
     cursor = connection.cursor()
 
+
+    # ======================================
     # USERS
+    # ======================================
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            id SERIAL PRIMARY KEY,
+
             name TEXT NOT NULL,
+
             email TEXT UNIQUE NOT NULL,
+
             password TEXT NOT NULL,
+
             contact TEXT,
+
             username TEXT UNIQUE
         )
     """)
 
+
+    # ======================================
     # SETS
+    # ======================================
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS sets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            id SERIAL PRIMARY KEY,
+
             user_id INTEGER NOT NULL,
+
             date TEXT NOT NULL,
+
             title TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            created_at TIMESTAMP
+                DEFAULT CURRENT_TIMESTAMP,
 
             FOREIGN KEY (user_id)
-            REFERENCES users(id)
-            ON DELETE CASCADE
+                REFERENCES users(id)
+                ON DELETE CASCADE
         )
     """)
 
+
+    # ======================================
     # WORDS
+    # ======================================
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS words (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            id SERIAL PRIMARY KEY,
+
             set_id INTEGER NOT NULL,
+
             word TEXT NOT NULL,
+
             translation TEXT NOT NULL,
+
             definition TEXT,
+
             example TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            created_at TIMESTAMP
+                DEFAULT CURRENT_TIMESTAMP,
 
             FOREIGN KEY (set_id)
-            REFERENCES sets(id)
-            ON DELETE CASCADE
+                REFERENCES sets(id)
+                ON DELETE CASCADE
         )
     """)
 
+
     connection.commit()
+
+    cursor.close()
     connection.close()
 
 
+# ==========================================
+# LOCAL TEST
+# ==========================================
+
 if __name__ == "__main__":
+
     create_database()
-    print("Database muvaffaqiyatli yaratildi!")
+
+    print(
+        "PostgreSQL database muvaffaqiyatli yaratildi!"
+    )
