@@ -1,25 +1,40 @@
+```python
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from dotenv import load_dotenv
 
 
 # ==========================================
-# POSTGRESQL DATABASE
+# ENVIRONMENT VARIABLES
+# ==========================================
+
+load_dotenv()
+
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL"
+)
+
+
+# ==========================================
+# DATABASE CONNECTION
 # ==========================================
 
 def get_database():
 
-    database_url = os.getenv("DATABASE_URL")
+    if not DATABASE_URL:
 
-    if not database_url:
         raise RuntimeError(
-            "DATABASE_URL environment variable topilmadi!"
+            "DATABASE_URL topilmadi!"
         )
 
+
     connection = psycopg2.connect(
-        database_url,
+        DATABASE_URL,
         cursor_factory=RealDictCursor
     )
+
 
     return connection
 
@@ -111,7 +126,37 @@ def create_database():
     """)
 
 
+    # ======================================
+    # PASSWORD RESETS
+    # ======================================
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS password_resets (
+
+            id SERIAL PRIMARY KEY,
+
+            user_id INTEGER NOT NULL,
+
+            code TEXT NOT NULL,
+
+            reset_token TEXT,
+
+            expires_at TIMESTAMP NOT NULL,
+
+            verified INTEGER DEFAULT 0,
+
+            created_at TIMESTAMP
+                DEFAULT CURRENT_TIMESTAMP,
+
+            FOREIGN KEY (user_id)
+                REFERENCES users(id)
+                ON DELETE CASCADE
+        )
+    """)
+
+
     connection.commit()
+
 
     cursor.close()
     connection.close()
@@ -126,5 +171,6 @@ if __name__ == "__main__":
     create_database()
 
     print(
-        "PostgreSQL database muvaffaqiyatli yaratildi!"
+        "PostgreSQL database muvaffaqiyatli tayyorlandi!"
     )
+```
