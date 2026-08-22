@@ -711,11 +711,3 @@ def reset_password():
             "Parol muvaffaqiyatli yangilandi!"
 
     }, 200
-
-
-# ==========================================
-# INITIALIZE RESET TABLE
-# ==========================================
-
-create_reset_table()
-
