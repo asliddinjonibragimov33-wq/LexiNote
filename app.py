@@ -5,6 +5,24 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_database, create_database
 
 
+# ==========================================
+# DATABASE INITIALIZATION
+# ==========================================
+
+create_database()
+
+
+# ==========================================
+# PASSWORD RESET
+# ==========================================
+
+from password_reset import password_reset
+
+
+# ==========================================
+# FLASK APP
+# ==========================================
+
 app = Flask(__name__)
 
 CORS(app)
