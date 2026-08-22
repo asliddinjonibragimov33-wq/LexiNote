@@ -2,8 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database import get_database
-from password_reset import password_reset
+from database import get_database, create_database
 
 
 app = Flask(__name__)
