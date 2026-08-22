@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Hisobni tiklash - LexiNote</title>
+
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <main class="auth-container">
+        <div class="auth-card">
+            <h1>LexiNote</h1>
+
+            <h2>Hisobni tiklash</h2>
+
+            <p class="auth-description">
+                Login yoki parolingizni tiklash uchun
+                email manzilingizni kiriting.
+            </p>
+
+            <form id="recovery-form">
+                <div class="form-group">
+                    <label for="contact">
+                        Email
+                    </label>
+
+                    <input
+                        type="text"
+                        id="contact"
+                        name="contact"
+                        placeholder="Emailingizni kiriting"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <button type="submit">
+                    Tasdiqlash kodini yuborish
+                </button>
+            </form>
+
+            <p
+                id="recovery-message"
+                class="auth-message"
+            ></p>
+
+            <p class="auth-footer">
+                Hisobingiz esingizdami?
+                <a href="login.html">
+                    Kirish
+                </a>
+            </p>
+        </div>
+    </main>
+
+    <script src="js/recovery.js"></script>
+</body>
+</html>

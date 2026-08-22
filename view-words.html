@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LexiNote</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- Navigatsiya -->
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">📖</span>
+            <span>LexiNote</span>
+        </div>
+        <nav class="nav-center">
+            <a href="dashboard.html">⌂ &nbsp; Bosh sahifa</a>
+        </nav>
+        <div class="user-area">
+            <div class="user-avatar" id="user-avatar">
+                F
+            </div>
+            <span class="username" id="navbar-user-name">
+                Foydalanuvchi
+            </span>
+            <span class="dropdown-icon">
+               ⌄
+            </span>
+            <button class="logout-btn"> ↪ &nbsp; Chiqish </button>
+        </div>
+    </header>
+
+    <!-- Asosiy qism -->
+    <main class="dashboard">
+        <section class="view-set-card">
+            <div class="view-set-header">
+                <a
+                    href="my-words.html"
+                    class="back-button"
+                >
+                    ← Mening lug‘atlarim
+                </a>
+                <div class="view-set-date" id="view-date">
+                    📅 Yuklanmoqda...
+                </div>
+                <h1 id="view-title">
+                    Yuklanmoqda...
+                </h1>
+                <p id="view-count">
+                    0 ta lug‘at
+                </p>
+                <hr>
+            </div>
+
+            <div
+                id="view-words-list"
+                class="view-words-list"
+            >
+            </div>
+        </section>           
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            © 2026 LexiNote. Barcha huquqlar himoyalangan.
+        </p>
+    </footer>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/view-words.js"></script>
+</body>
+</html>

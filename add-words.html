@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>So‘z qo‘shish - LexiNote</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <!-- Navigatsiya -->
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">📖</span>
+            <span>LexiNote</span>
+        </div>
+        <nav class="nav-center">
+            <a href="dashboard.html">⌂ &nbsp; Bosh sahifa</a>
+        </nav>
+        <div class="user-area">
+            <div class="user-avatar" id="user-avatar">
+                F
+            </div>
+            <span class="username" id="navbar-user-name">Foydalanuvchi</span>
+
+            <button class="logout-btn">
+                ↪ &nbsp; Chiqish
+            </button>
+        </div>
+    </header>
+
+    <!-- Asosiy qism -->
+    <main class="add-words-page">
+        <section class="words-header">
+            <a href="add-word.html" class="back-link">
+                ← Lug‘at to‘plamiga qaytish
+            </a>
+            <div class="set-info">
+                <span class="set-date" id="set-date">
+                    📅 Yuklanmoqda...
+                </span>
+                <h1 id="set-title">
+                    Yuklanmoqda...
+                </h1>
+            </div>
+            <p>
+                Ushbu to‘plamga yodlamoqchi bo‘lgan
+                so‘zlaringizni qo‘shing.
+            </p>
+        </section>
+
+        <!-- Yangi so‘z qo‘shish -->
+        <section class="add-word-card">
+            <div class="form-title">
+                <div class="form-title-icon">
+                    +
+                </div>
+                <div>
+                    <h2>Yangi so‘z</h2>
+                    <p>
+                        Lug‘at to‘plamingizga yangi so‘z qo‘shing.
+                    </p>
+                </div>
+            </div>
+
+
+            <form id="word-form">
+                <div class="form-group">
+                    <label for="word">
+                        So‘z
+                    </label>
+                    <input
+                        type="text"
+                        id="word"
+                        name="word"
+                        placeholder="Masalan: Doctor"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="translation">
+                        Tarjimasi
+                    </label>
+                    <input
+                        type="text"
+                        id="translation"
+                        name="translation"
+                        placeholder="Masalan: Shifokor"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="definition">
+                        Izoh
+                        <span>ixtiyoriy</span>
+                    </label>
+                    <textarea
+                        id="definition"
+                        name="definition"
+                        placeholder="So‘zning ma'nosi yoki qo‘shimcha ma'lumot..."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="example">
+                        Misol gap
+                        <span>ixtiyoriy</span>
+                    </label>
+                    <textarea
+                        id="example"
+                        name="example"
+                        placeholder="Masalan: My brother is a doctor."
+                    ></textarea>
+                </div>
+
+                <button
+                    type="submit"
+                    class="add-word-button"
+                >
+                    <span>＋</span>
+                    So‘zni qo‘shish
+                </button>
+            </form>
+        </section>
+
+        <!-- Qo‘shilgan lug‘atlar -->
+        <section class="added-words-card">
+            <div class="added-header">
+                <div>
+                    <h2>Qo‘shilgan lug‘atlar</h2>
+                    <p>
+                        Hozirgacha qo‘shilgan so‘zlar:
+                        <strong id="word-count">0</strong> ta
+                    </p>
+                </div>
+            </div>
+
+            <div id="words-list">
+
+                <!-- JavaScript orqali lug‘atlar shu yerga chiqadi -->
+                <div class="empty-words">
+                    <span>
+                        📖
+                    </span>
+                    <p>Hali hech qanday lug‘at qo‘shilmagan.</p>
+                </div>
+            </div>
+
+            <div class="finish-section">
+                <button
+                    type="button"
+                    class="save-set-button"
+                    id="save-set-button"
+                >
+                    ✓ &nbsp; Lug‘atlarni saqlash
+                </button>
+            </div>
+        </section>
+    </main>
+
+
+    <footer>
+        <p>
+            © 2026 LexiNote. Barcha huquqlar himoyalangan.
+        </p>
+    </footer>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/add-words.js"></script>
+</body>
+</html>

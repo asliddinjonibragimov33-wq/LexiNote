@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kirish - LexiNote</title>
+
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body>
+    <main class="auth-container">
+        <div class="auth-card">
+            <h1>LexiNote</h1>
+            <h2>Hisobingizga kiring</h2>
+            <p class="auth-description">Shaxsiy lug‘at daftaringizga kirish uchun login va parolingizni kiriting.</p>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Login</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Loginingizni kiriting"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Parol</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Parolingizni kiriting"
+                        required
+                    >
+                </div>
+
+                <div class="forgot-password">
+                    <a href="recovery.html">Login yoki parolni unutdingizmi?</a>
+                </div>
+
+                <button type="submit">Kirish</button>
+            </form>
+
+            <p class="auth-footer">Hisobingiz yo‘qmi?<a href="register.html">Ro‘yxatdan o‘tish</a></p>
+        </div>
+    </main>
+    <script src="js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mening lug'atlarim - LexiNote</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">📖</span>
+            <span>LexiNote</span>
+        </div>
+        <nav class="nav-center">
+            <a href="dashboard.html">⌂ Bosh sahifa</a>
+        </nav>
+        <div class="user-area">
+            <div class="user-avatar" id="user-avatar">F</div>
+            <span class="username" id="navbar-user-name">
+                Foydalanuvchi
+            </span>
+            <button class="logout-btn">
+                ↪ Chiqish
+            </button>
+        </div>
+    </header>
+
+    <main class="words-page">
+        <section class="page-header">
+            <div>
+                <a href="dashboard.html" class="back-link">
+                    ← Dashboardga qaytish
+                </a>
+                <h1>Mening lug'atlarim</h1>
+                <p>
+                    Qo'shgan barcha so'zlaringiz shu yerda saqlanadi.
+                </p>
+            </div>
+
+            <a href="add-word.html" class="new-word-btn">+ Yangi lug'at</a>
+
+        </section>
+
+        <section class="search-box">
+            <input type="text" placeholder="Lug'atlardan qidirish...">
+        </section>
+        <section class="sets-container">
+            <div id="sets-list"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 LexiNote. Barcha huquqlar himoyalangan.</p>
+    </footer>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/my-words.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tasdiqlash - LexiNote</title>
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <main class="auth-container">
+        <div class="auth-card">
+            <h1>
+                LexiNote
+            </h1>
+
+            <h2>
+                Hisobni tasdiqlash
+            </h2>
+
+            <p class="auth-description">
+                Email yoki telefon raqamingizga yuborilgan
+                6 xonali tasdiqlash kodini kiriting.
+            </p>
+
+            <form id="verify-form">
+                <div class="form-group">
+                    <label for="verification-code">
+                        Tasdiqlash kodi
+                    </label>
+
+                    <input
+                        type="text"
+                        id="verification-code"
+                        name="verification-code"
+                        placeholder="6 xonali kodni kiriting"
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        required
+                    >
+                </div>
+
+                <button type="submit">
+                    Tasdiqlash
+                </button>
+            </form>
+
+            <p
+                id="verify-message"
+                class="auth-message"
+            ></p>
+
+            <p class="auth-footer">
+                Kod kelmadimi?
+
+                <a
+                    href="#"
+                    id="resend-code"
+                >
+                    Qayta yuborish
+                </a>
+            </p>
+        </div>
+    </main>
+
+    <script src="js/verify.js"></script>
+</body>
+</html>

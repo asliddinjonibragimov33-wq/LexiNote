@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Quiz - LexiNote</title>
+
+    <link
+        rel="stylesheet"
+        href="css/quiz.css"
+    >
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVIGATSIYA
+    ========================== -->
+
+    <header class="navbar">
+
+        <div class="logo">
+
+            <span class="logo-icon">
+                📖
+            </span>
+
+            <span>
+                LexiNote
+            </span>
+
+        </div>
+
+
+        <nav class="nav-center">
+
+            <a href="dashboard.html">
+                ⌂ &nbsp; Bosh sahifa
+            </a>
+
+        </nav>
+
+
+        <div class="user-area">
+
+            <div
+                class="user-avatar"
+                id="user-avatar"
+            >
+                F
+            </div>
+
+
+            <span
+                class="username"
+                id="navbar-user-name"
+            >
+                Foydalanuvchi
+            </span>
+
+
+            <span class="dropdown-icon">
+                ⌄
+            </span>
+
+
+            <button class="logout-btn">
+                ↪ &nbsp; Chiqish
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         ASOSIY QISM
+    ========================== -->
+
+    <main class="dashboard">
+
+        <section class="quiz-page">
+
+
+            <!-- =========================
+                 QUIZ HEADER
+            ========================== -->
+
+            <div class="quiz-header">
+
+                <a
+                    href="word-quiz.html"
+                    class="quiz-back"
+                >
+                    ← Lug‘at so‘ragich
+                </a>
+
+
+                <div class="quiz-header-right">
+
+                    <div class="quiz-progress">
+
+                        <span id="question-number">
+                            1
+                        </span>
+
+                        /
+
+                        <span id="total-questions">
+                            10
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        id="finish-button"
+                        class="finish-button"
+                    >
+                        Yakunlash
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 QUIZ CARD
+            ========================== -->
+
+            <div class="quiz-card">
+
+
+                <!-- To‘plam nomi -->
+
+                <div
+                    class="quiz-set-name"
+                    id="quiz-set-name"
+                >
+                </div>
+
+
+
+                <!-- =========================
+                     SAVOL
+                ========================== -->
+
+                <div class="quiz-question">
+
+                    <span>
+                        Ushbu so‘zning tarjimasi nima?
+                    </span>
+
+
+                    <!-- Savol + 🔄 -->
+
+                    <div class="question-row">
+
+                        <h1 id="question-word">
+                        </h1>
+
+
+                        <button
+                            type="button"
+                            id="reverse-button"
+                            class="reverse-button"
+                            title="Savol yo‘nalishini almashtirish"
+                        >
+                            🔄
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================
+                     JAVOB
+                ========================== -->
+
+                <div class="answer-area">
+
+                    <input
+                        type="text"
+                        id="answer-input"
+                        placeholder="Tarjimasini yozing..."
+                        autocomplete="off"
+                    >
+
+
+                    <button
+                        id="check-button"
+                        class="check-button"
+                    >
+                        ✓ Tekshirish
+                    </button>
+
+                </div>
+
+
+
+                <!-- =========================
+                     NATIJA XABARI
+                ========================== -->
+
+                <div
+                    id="result-message"
+                    class="result-message"
+                >
+                </div>
+
+
+
+                <!-- =========================
+                     KEYINGI SO‘Z
+                ========================== -->
+
+                <button
+                    id="next-button"
+                    class="next-button"
+                >
+                    Keyingi →
+                </button>
+
+            </div>
+
+
+
+            <!-- =========================
+                 QUIZ NATIJASI
+            ========================== -->
+
+            <div
+                id="quiz-result"
+                class="quiz-result"
+            >
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer>
+
+        <p>
+            © 2026 LexiNote.
+            Barcha huquqlar himoyalangan.
+        </p>
+
+    </footer>
+
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <script src="js/navbar.js"></script>
+    <script src="js/quiz.js"></script>
+</body>
+
+</html>

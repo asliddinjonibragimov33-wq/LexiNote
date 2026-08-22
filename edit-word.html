@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LexiNote</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- Navigatsiya -->
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">📖</span>
+            <span>LexiNote</span>
+        </div>
+        <nav class="nav-center">
+            <a href="dashboard.html">⌂ &nbsp; Bosh sahifa</a>
+        </nav>
+        <div class="user-area">
+            <div class="user-avatar" id="user-avatar">
+                F
+            </div>
+            <span class="username" id="navbar-user-name">
+                Foydalanuvchi
+            </span>
+            <span class="dropdown-icon">
+               ⌄
+            </span>
+            <button class="logout-btn"> ↪ &nbsp; Chiqish </button>
+        </div>
+    </header>
+
+    <!-- Asosiy qism -->
+    <main class="dashboard">
+        <section class="edit-word-card">
+            <div class="form-title">
+                <div class="form-title-icon">
+                    ✏️
+                </div>
+                <div>
+                    <h2>
+                        Lug‘atni tahrirlash
+                    </h2>
+
+                    <p>
+                        Lug‘at ma’lumotlarini o‘zgartiring.
+                    </p>
+
+                </div>
+            </div>
+
+            <form id="edit-word-form">
+                <div class="form-group">
+                    <label for="edit-word">
+                        So‘z
+                    </label>
+                    <input
+                        type="text"
+                        id="edit-word"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-translation">
+                        Tarjimasi
+                    </label>
+                    <input
+                        type="text"
+                        id="edit-translation"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-definition">
+                        Izoh
+                        <span>ixtiyoriy</span>
+                    </label>
+                    <textarea
+                        id="edit-definition"
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-example">
+                        Misol gap
+                        <span>ixtiyoriy</span>
+                    </label>
+                    <textarea
+                        id="edit-example"
+                    ></textarea>
+
+                </div>
+
+                <div class="form-actions">
+                    <a
+                        href="view-words.html"
+                        class="cancel-button"
+                    >
+                        Bekor qilish
+                    </a>
+                    <button
+                        type="submit"
+                        class="save-button"
+                    >
+                        ✓ &nbsp; Saqlash
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            © 2026 LexiNote. Barcha huquqlar himoyalangan.
+        </p>
+    </footer>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/edit-word.js"></script>
+</body>
+</html>

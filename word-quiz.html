@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LexiNote</title>
+    <link rel="stylesheet" href="css/quiz.css">
+</head>
+<body>
+    <!-- Navigatsiya -->
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">📖</span>
+            <span>LexiNote</span>
+        </div>
+        <nav class="nav-center">
+            <a href="dashboard.html">⌂ &nbsp; Bosh sahifa</a>
+        </nav>
+        <div class="user-area">
+            <div class="user-avatar" id="user-avatar">
+                F
+            </div>
+            <span class="username" id="navbar-user-name">
+                Foydalanuvchi
+            </span>
+            <span class="dropdown-icon">
+               ⌄
+            </span>
+            <button class="logout-btn"> ↪ &nbsp; Chiqish </button>
+        </div>
+    </header>
+
+    <!-- Asosiy qism -->
+    <main class="dashboard">
+        <section class="quiz-select-page">
+            <div class="quiz-page-header">
+                <div class="quiz-page-icon">
+                    🧠
+                </div>
+                <div>
+                    <h1>
+                        Lug‘at so‘ragich
+                    </h1>
+                    <p>
+                        Yodlagan lug‘atlaringizni sinab ko‘ring.
+                    </p>
+                </div>
+            </div>
+
+            <div class="quiz-select-card">
+                <h2>
+                    Qaysi lug‘atni ishlatamiz?
+                </h2>
+                <p class="quiz-select-description">
+                    Test uchun lug‘at to‘plamini tanlang.
+                </p>
+  
+                <div
+                    id="quiz-sets-list"
+                    class="quiz-sets-list"
+                >
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            © 2026 LexiNote. Barcha huquqlar himoyalangan.
+        </p>
+    </footer>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/word-quiz.js"></script>
+</body>
+</html>

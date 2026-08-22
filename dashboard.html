@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LexiNote</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- Navigatsiya -->
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">📖</span>
+            <span>LexiNote</span>
+        </div>
+        <nav class="nav-center">
+            <a href="dashboard.html">⌂ &nbsp; Bosh sahifa</a>
+        </nav>
+        <div class="user-area">
+            <div class="user-avatar" id="user-avatar">
+                F
+            </div>
+            <span class="username" id="navbar-user-name">
+                Foydalanuvchi
+            </span>
+            <span class="dropdown-icon">
+               ⌄
+            </span>
+            <button class="logout-btn"> ↪ &nbsp; Chiqish </button>
+        </div>
+    </header>
+
+    <!-- Asosiy qism -->
+    <main class="dashboard">
+        <section class="welcome">
+            <h1>Xush kelibsiz, <span id="user-name">Foydalanuvchi</span>! 👋</h1>
+            <p>
+                Shaxsiy lug‘at daftaringiz bilan so‘zlarni
+                o‘rganing va eslab qolishingiz oson bo‘lsin.
+            </p>
+        </section>
+
+        <!-- Kartochkalar -->
+        <section class="feature-cards">
+
+            <!-- 1. Lug‘at qo‘shish -->
+            <div class="feature-card add-card">
+                <div class="card-icon">
+                    +
+                </div>
+                <h2>Lug‘at qo‘shish</h2>
+                <p>
+                    Yangi so‘zlarni lug‘atingizga qo‘shing,
+                    ma’nosi va tarjimasi bilan saqlang.
+                </p>
+                <a href="add-word.html" class="card-button">
+                    ＋ &nbsp; Lug‘at qo‘shish
+                </a>
+            </div>
+
+            <!-- 2. Mening lug‘atlarim -->
+            <div class="feature-card words-card">
+                <div class="card-icon">
+                    📖
+                </div>
+                <h2> Mening lug‘atlarim</h2>
+                <p>
+                    Saqlangan lug‘atlaringizni ko‘ring,
+                    tahrirlang yoki o‘chiring.
+                </p>
+                <a href="my-words.html" class="card-button">
+                    📖 &nbsp; Lug‘atlarimni ochish
+                </a>
+            </div>
+
+            <!-- 3. Lug‘at so‘ragich -->
+            <div class="feature-card search-card">
+                <div class="card-icon">
+                    🔍
+                </div>
+                <h2>Lug‘at so‘ragich</h2>
+                <p>
+                    Istalgan so‘zning ma’nosi va tarjimasini
+                    tez va oson qidiring.
+                </p>
+                <a href="word-quiz.html" class="card-button">
+                    🔍 &nbsp; Qidirishni boshlash
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            © 2026 LexiNote. Barcha huquqlar himoyalangan.
+        </p>
+    </footer>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

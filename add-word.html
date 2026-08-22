@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Lug‘at qo‘shish - LexiNote</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- Navigatsiya -->
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-icon">📖</span>
+            <span>LexiNote</span>
+        </div>
+        <nav class="nav-center">
+            <a href="dashboard.html">⌂ &nbsp; Bosh sahifa</a>
+        </nav>
+        <div class="user-area">
+            <div class="user-avatar" id="user-avatar">
+                F
+            </div>
+            <span class="username" id="navbar-user-name">Foydalanuvchi</span>
+
+            <span class="dropdown-icon">⌄</span>
+            <button class="logout-btn">↪ &nbsp; Chiqish</button>
+        </div>
+    </header>
+
+    <!-- Asosiy qism -->
+    <main class="word-page">
+        <section class="word-header">
+            <a href="dashboard.html" class="back-link">
+                ← Dashboardga qaytish
+            </a>
+            <h1>Yangi lug‘at yaratish</h1>
+            <p>
+                Bugun o‘rganayotgan so‘zlaringiz uchun yangi
+                lug‘atlar to‘plamini yarating.
+            </p>
+        </section>
+
+        <section class="word-form-card">
+            <form id="set-form">
+
+                <div class="form-group">
+
+                    <label for="word-date">
+                        Sana
+                    </label>
+
+                    <input
+                        type="date"
+                        id="word-date"
+                        name="word-date"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="word-title">
+                        Mavzu yoki izoh
+                    </label>
+
+                    <input
+                        type="text"
+                        id="word-title"
+                        name="word-title"
+                        placeholder="Masalan: Kasblar"
+                        required
+                    >
+
+                </div>
+                
+                <div class="form-actions">
+
+                    <a href="dashboard.html" class="cancel-button">
+                        Bekor qilish
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="save-button">
+                        &nbsp; Davom etish
+                    </button>
+
+                </div>
+
+            </form>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            © 2026 LexiNote. Barcha huquqlar himoyalangan.
+        </p>
+    </footer>
+    <script src="js/navbar.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/add-word.js"></script>
+</body>
+</html>
