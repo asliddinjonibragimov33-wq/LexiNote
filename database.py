@@ -1,4 +1,3 @@
-```python
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -173,4 +172,3 @@ if __name__ == "__main__":
     print(
         "PostgreSQL database muvaffaqiyatli tayyorlandi!"
     )
-```
