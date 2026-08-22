@@ -1,41 +1,67 @@
+```python
 from flask import Flask, request
 from flask_cors import CORS
-import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from database import get_database
 from password_reset import password_reset
 
+
 app = Flask(__name__)
+
 CORS(app)
+
 app.register_blueprint(password_reset)
 
-def get_database():
-    connection = sqlite3.connect("vocabulary.db")
-    connection.row_factory = sqlite3.Row
-    return connection
 
+# ==========================================
+# HOME
+# ==========================================
 
 @app.route("/")
 def home():
+
     return "Vocabulary App Backend ishlayapti!"
 
 
+# ==========================================
+# USERS
+# ==========================================
+
 @app.route("/users")
 def users():
+
     connection = get_database()
 
-    users_data = connection.execute(
-        "SELECT id, name, email, contact, username FROM users"
-    ).fetchall()
+    cursor = connection.cursor()
 
+    cursor.execute("""
+        SELECT
+            id,
+            name,
+            email,
+            contact,
+            username
+        FROM users
+    """)
+
+    users_data = cursor.fetchall()
+
+    cursor.close()
     connection.close()
 
     return {
-        "users": [dict(user) for user in users_data]
+        "users": users_data
     }
 
 
+# ==========================================
+# REGISTER
+# ==========================================
+
 @app.route("/register", methods=["POST"])
 def register():
+
     data = request.get_json()
 
     name = data.get("name")
@@ -43,140 +69,302 @@ def register():
     username = data.get("username")
     password = data.get("password")
 
+
     if not name or not contact or not username or not password:
+
         return {
-            "error": "Barcha maydonlarni to'ldiring!"
+            "error":
+                "Barcha maydonlarni to'ldiring!"
         }, 400
 
-    hashed_password = generate_password_hash(password)
+
+    hashed_password = generate_password_hash(
+        password
+    )
+
 
     connection = get_database()
 
+    cursor = connection.cursor()
+
+
     try:
-        connection.execute(
+
+        cursor.execute(
             """
-            INSERT INTO users (name, email, contact, username, password)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO users (
+                name,
+                email,
+                contact,
+                username,
+                password
+            )
+
+            VALUES (%s, %s, %s, %s, %s)
+
+            RETURNING id
             """,
-            (name, contact, contact, username, hashed_password)
+
+            (
+                name,
+                contact,
+                contact,
+                username,
+                hashed_password
+            )
         )
+
+
+        user_id = cursor.fetchone()["id"]
 
         connection.commit()
 
-    except sqlite3.IntegrityError:
+
+    except Exception as error:
+
+        connection.rollback()
+
+        cursor.close()
         connection.close()
 
+        print(
+            "Register error:",
+            error
+        )
+
         return {
-            "error": "Bu contact yoki username allaqachon mavjud!"
+            "error":
+                "Bu contact yoki username allaqachon mavjud!"
         }, 409
 
+
+    cursor.close()
     connection.close()
 
+
     return {
-        "message": "Ro'yxatdan o'tish muvaffaqiyatli!",
-        "name": name,
-        "contact": contact,
-        "username": username
+
+        "message":
+            "Ro'yxatdan o'tish muvaffaqiyatli!",
+
+        "id":
+            user_id,
+
+        "name":
+            name,
+
+        "contact":
+            contact,
+
+        "username":
+            username
+
     }, 201
 
 
+# ==========================================
+# LOGIN
+# ==========================================
+
 @app.route("/login", methods=["POST"])
 def login():
+
     data = request.get_json()
 
     username = data.get("username")
     password = data.get("password")
 
+
     if not username or not password:
+
         return {
-            "error": "Login va parolni kiriting!"
+            "error":
+                "Login va parolni kiriting!"
         }, 400
+
 
     connection = get_database()
 
-    user = connection.execute(
-        "SELECT * FROM users WHERE username = ?",
-        (username,)
-    ).fetchone()
+    cursor = connection.cursor()
 
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM users
+        WHERE username = %s
+        """,
+
+        (username,)
+    )
+
+
+    user = cursor.fetchone()
+
+
+    cursor.close()
     connection.close()
 
+
     if user is None:
+
         return {
-            "error": "Login yoki parol noto'g'ri!"
+            "error":
+                "Login yoki parol noto'g'ri!"
         }, 401
 
-    if not check_password_hash(user["password"], password):
+
+    if not check_password_hash(
+        user["password"],
+        password
+    ):
+
         return {
-            "error": "Login yoki parol noto'g'ri!"
+            "error":
+                "Login yoki parol noto'g'ri!"
         }, 401
+
 
     return {
-        "message": "Login muvaffaqiyatli!",
+
+        "message":
+            "Login muvaffaqiyatli!",
+
         "user": {
-            "id": user["id"],
-            "name": user["name"],
-            "username": user["username"],
-            "contact": user["contact"]
+
+            "id":
+                user["id"],
+
+            "name":
+                user["name"],
+
+            "username":
+                user["username"],
+
+            "contact":
+                user["contact"]
+
         }
+
     }, 200
 
 
+# ==========================================
+# CREATE SET
+# ==========================================
+
 @app.route("/sets", methods=["POST"])
 def create_set():
+
     data = request.get_json()
 
     user_id = data.get("user_id")
     date = data.get("date")
     title = data.get("title")
 
+
     if not user_id or not date or not title:
+
         return {
-            "error": "Sana, mavzu va foydalanuvchi kerak!"
+            "error":
+                "Sana, mavzu va foydalanuvchi kerak!"
         }, 400
+
 
     connection = get_database()
 
-    # Foydalanuvchi mavjudligini tekshirish
-    user = connection.execute(
-        "SELECT id FROM users WHERE id = ?",
+    cursor = connection.cursor()
+
+
+    cursor.execute(
+        """
+        SELECT id
+        FROM users
+        WHERE id = %s
+        """,
+
         (user_id,)
-    ).fetchone()
+    )
+
+
+    user = cursor.fetchone()
+
 
     if user is None:
+
+        cursor.close()
         connection.close()
 
         return {
-            "error": "Foydalanuvchi topilmadi!"
+            "error":
+                "Foydalanuvchi topilmadi!"
         }, 404
 
-    cursor = connection.execute(
+
+    cursor.execute(
         """
-        INSERT INTO sets (user_id, date, title)
-        VALUES (?, ?, ?)
+        INSERT INTO sets (
+            user_id,
+            date,
+            title
+        )
+
+        VALUES (%s, %s, %s)
+
+        RETURNING id
         """,
-        (user_id, date, title)
+
+        (
+            user_id,
+            date,
+            title
+        )
     )
+
+
+    set_id = cursor.fetchone()["id"]
 
     connection.commit()
 
-    set_id = cursor.lastrowid
 
+    cursor.close()
     connection.close()
 
+
     return {
-        "message": "Lug'at muvaffaqiyatli yaratildi!",
+
+        "message":
+            "Lug'at muvaffaqiyatli yaratildi!",
+
         "set": {
-            "id": set_id,
-            "user_id": user_id,
-            "date": date,
-            "title": title
+
+            "id":
+                set_id,
+
+            "user_id":
+                user_id,
+
+            "date":
+                date,
+
+            "title":
+                title
+
         }
+
     }, 201
 
 
-@app.route("/sets/<int:set_id>/words", methods=["POST"])
+# ==========================================
+# ADD WORD
+# ==========================================
+
+@app.route(
+    "/sets/<int:set_id>/words",
+    methods=["POST"]
+)
 def add_word_to_set(set_id):
+
     data = request.get_json()
 
     word = data.get("word")
@@ -184,28 +372,46 @@ def add_word_to_set(set_id):
     definition = data.get("definition")
     example = data.get("example")
 
+
     if not word or not translation:
+
         return {
-            "error": "So'z va tarjima kiritilishi shart!"
+            "error":
+                "So'z va tarjima kiritilishi shart!"
         }, 400
+
 
     connection = get_database()
 
-    # Set mavjudligini tekshirish
-    vocabulary_set = connection.execute(
-        "SELECT id FROM sets WHERE id = ?",
+    cursor = connection.cursor()
+
+
+    cursor.execute(
+        """
+        SELECT id
+        FROM sets
+        WHERE id = %s
+        """,
+
         (set_id,)
-    ).fetchone()
+    )
+
+
+    vocabulary_set = cursor.fetchone()
+
 
     if vocabulary_set is None:
+
+        cursor.close()
         connection.close()
 
         return {
-            "error": "Lug'at to'plami topilmadi!"
+            "error":
+                "Lug'at to'plami topilmadi!"
         }, 404
 
-    # So'zni setga qo'shish
-    cursor = connection.execute(
+
+    cursor.execute(
         """
         INSERT INTO words (
             set_id,
@@ -214,8 +420,18 @@ def add_word_to_set(set_id):
             definition,
             example
         )
-        VALUES (?, ?, ?, ?, ?)
+
+        VALUES (
+            %s,
+            %s,
+            %s,
+            %s,
+            %s
+        )
+
+        RETURNING id
         """,
+
         (
             set_id,
             word,
@@ -225,104 +441,187 @@ def add_word_to_set(set_id):
         )
     )
 
+
+    word_id = cursor.fetchone()["id"]
+
     connection.commit()
 
-    word_id = cursor.lastrowid
 
+    cursor.close()
     connection.close()
 
+
     return {
-        "message": "So'z muvaffaqiyatli qo'shildi!",
+
+        "message":
+            "So'z muvaffaqiyatli qo'shildi!",
+
         "word": {
-            "id": word_id,
-            "set_id": set_id,
-            "word": word,
-            "translation": translation,
-            "definition": definition,
-            "example": example
+
+            "id":
+                word_id,
+
+            "set_id":
+                set_id,
+
+            "word":
+                word,
+
+            "translation":
+                translation,
+
+            "definition":
+                definition,
+
+            "example":
+                example
+
         }
+
     }, 201
 
 
+# ==========================================
+# GET USER SETS
+# ==========================================
+
 @app.route("/sets", methods=["GET"])
 def get_sets():
-    user_id = request.args.get("user_id")
+
+    user_id = request.args.get(
+        "user_id"
+    )
+
 
     if not user_id:
+
         return {
-            "error": "Foydalanuvchi ID si kerak!"
+            "error":
+                "Foydalanuvchi ID si kerak!"
         }, 400
+
 
     connection = get_database()
 
-    sets = connection.execute(
+    cursor = connection.cursor()
+
+
+    cursor.execute(
         """
         SELECT
             sets.id,
             sets.date,
             sets.title,
             COUNT(words.id) AS word_count
+
         FROM sets
+
         LEFT JOIN words
             ON sets.id = words.set_id
-        WHERE sets.user_id = ?
-        GROUP BY sets.id
+
+        WHERE sets.user_id = %s
+
+        GROUP BY
+            sets.id,
+            sets.date,
+            sets.title
+
         ORDER BY sets.id DESC
         """,
-        (user_id,)
-    ).fetchall()
 
+        (user_id,)
+    )
+
+
+    sets = cursor.fetchall()
+
+
+    cursor.close()
     connection.close()
+
 
     result = []
 
+
     for set_item in sets:
+
         result.append({
-            "id": set_item["id"],
-            "date": set_item["date"],
-            "title": set_item["title"],
-            "word_count": set_item["word_count"]
+
+            "id":
+                set_item["id"],
+
+            "date":
+                set_item["date"],
+
+            "title":
+                set_item["title"],
+
+            "word_count":
+                set_item["word_count"]
+
         })
+
 
     return {
         "sets": result
     }, 200
 
 
-@app.route("/sets/<int:set_id>/words", methods=["GET"])
+# ==========================================
+# GET WORDS FROM SET
+# ==========================================
+
+@app.route(
+    "/sets/<int:set_id>/words",
+    methods=["GET"]
+)
 def get_words_from_set(set_id):
 
-    user_id = request.args.get("user_id")
+    user_id = request.args.get(
+        "user_id"
+    )
+
 
     if not user_id:
 
         return {
-            "error": "Foydalanuvchi ID si kerak!"
+            "error":
+                "Foydalanuvchi ID si kerak!"
         }, 400
 
 
     connection = get_database()
 
+    cursor = connection.cursor()
 
-    #Setni aynan shu foydalanuvchiga tegishliligini tekshirish 
 
-    vocabulary_set = connection.execute(
+    cursor.execute(
         """
         SELECT
             id,
             user_id,
             date,
             title
+
         FROM sets
-        WHERE id = ?
-        AND user_id = ?
+
+        WHERE id = %s
+        AND user_id = %s
         """,
-        (set_id, user_id)
-    ).fetchone()
+
+        (
+            set_id,
+            user_id
+        )
+    )
+
+
+    vocabulary_set = cursor.fetchone()
 
 
     if vocabulary_set is None:
 
+        cursor.close()
         connection.close()
 
         return {
@@ -331,7 +630,7 @@ def get_words_from_set(set_id):
         }, 404
 
 
-    words = connection.execute(
+    cursor.execute(
         """
         SELECT
             id,
@@ -339,14 +638,22 @@ def get_words_from_set(set_id):
             translation,
             definition,
             example
+
         FROM words
-        WHERE set_id = ?
+
+        WHERE set_id = %s
+
         ORDER BY id ASC
         """,
+
         (set_id,)
-    ).fetchall()
+    )
 
 
+    words = cursor.fetchall()
+
+
+    cursor.close()
     connection.close()
 
 
@@ -399,35 +706,77 @@ def get_words_from_set(set_id):
     }, 200
 
 
-@app.route("/words/<int:word_id>", methods=["DELETE"])
+# ==========================================
+# DELETE WORD
+# ==========================================
+
+@app.route(
+    "/words/<int:word_id>",
+    methods=["DELETE"]
+)
 def delete_word(word_id):
+
     connection = get_database()
 
-    word = connection.execute(
-        "SELECT id FROM words WHERE id = ?",
-        (word_id,)
-    ).fetchone()
+    cursor = connection.cursor()
 
-    if word is None:
-        connection.close()
 
-        return {
-            "error": "So‘z topilmadi!"
-        }, 404
+    cursor.execute(
+        """
+        SELECT id
+        FROM words
+        WHERE id = %s
+        """,
 
-    connection.execute(
-        "DELETE FROM words WHERE id = ?",
         (word_id,)
     )
 
+
+    word = cursor.fetchone()
+
+
+    if word is None:
+
+        cursor.close()
+        connection.close()
+
+        return {
+            "error":
+                "So‘z topilmadi!"
+        }, 404
+
+
+    cursor.execute(
+        """
+        DELETE FROM words
+        WHERE id = %s
+        """,
+
+        (word_id,)
+    )
+
+
     connection.commit()
+
+
+    cursor.close()
     connection.close()
 
+
     return {
-        "message": "So‘z muvaffaqiyatli o‘chirildi!"
+        "message":
+            "So‘z muvaffaqiyatli o‘chirildi!"
     }, 200
 
-@app.route("/words/<int:word_id>", methods=["PUT"])
+
+# ==========================================
+# UPDATE WORD
+# ==========================================
+
+@app.route(
+    "/words/<int:word_id>",
+    methods=["PUT"]
+)
 def update_word(word_id):
 
     data = request.get_json()
@@ -437,40 +786,58 @@ def update_word(word_id):
     definition = data.get("definition")
     example = data.get("example")
 
+
     if not word or not translation:
+
         return {
-            "error": "So‘z va tarjima kiritilishi shart!"
+            "error":
+                "So‘z va tarjima kiritilishi shart!"
         }, 400
+
 
     connection = get_database()
 
-    existing_word = connection.execute(
+    cursor = connection.cursor()
+
+
+    cursor.execute(
         """
         SELECT id
         FROM words
-        WHERE id = ?
+        WHERE id = %s
         """,
+
         (word_id,)
-    ).fetchone()
+    )
+
+
+    existing_word = cursor.fetchone()
+
 
     if existing_word is None:
 
+        cursor.close()
         connection.close()
 
         return {
-            "error": "So‘z topilmadi!"
+            "error":
+                "So‘z topilmadi!"
         }, 404
 
-    connection.execute(
+
+    cursor.execute(
         """
         UPDATE words
+
         SET
-            word = ?,
-            translation = ?,
-            definition = ?,
-            example = ?
-        WHERE id = ?
+            word = %s,
+            translation = %s,
+            definition = %s,
+            example = %s
+
+        WHERE id = %s
         """,
+
         (
             word,
             translation,
@@ -480,57 +847,121 @@ def update_word(word_id):
         )
     )
 
+
     connection.commit()
 
+
+    cursor.close()
     connection.close()
 
+
     return {
-        "message": "So‘z muvaffaqiyatli yangilandi!",
+
+        "message":
+            "So‘z muvaffaqiyatli yangilandi!",
+
         "word": {
-            "id": word_id,
-            "word": word,
-            "translation": translation,
-            "definition": definition,
-            "example": example
+
+            "id":
+                word_id,
+
+            "word":
+                word,
+
+            "translation":
+                translation,
+
+            "definition":
+                definition,
+
+            "example":
+                example
+
         }
+
     }, 200
 
-@app.route("/sets/<int:set_id>", methods=["DELETE"])
+
+# ==========================================
+# DELETE SET
+# ==========================================
+
+@app.route(
+    "/sets/<int:set_id>",
+    methods=["DELETE"]
+)
 def delete_set(set_id):
 
     connection = get_database()
 
-    # Set mavjudligini tekshirish
-    vocabulary_set = connection.execute(
-        "SELECT id FROM sets WHERE id = ?",
+    cursor = connection.cursor()
+
+
+    cursor.execute(
+        """
+        SELECT id
+        FROM sets
+        WHERE id = %s
+        """,
+
         (set_id,)
-    ).fetchone()
+    )
+
+
+    vocabulary_set = cursor.fetchone()
+
 
     if vocabulary_set is None:
+
+        cursor.close()
         connection.close()
 
         return {
-            "error": "Lug'at to'plami topilmadi!"
+            "error":
+                "Lug'at to'plami topilmadi!"
         }, 404
 
-    # Setga tegishli so'zlarni o'chirish
-    connection.execute(
-        "DELETE FROM words WHERE set_id = ?",
+
+    cursor.execute(
+        """
+        DELETE FROM words
+        WHERE set_id = %s
+        """,
+
         (set_id,)
     )
 
-    # Setning o'zini o'chirish
-    connection.execute(
-        "DELETE FROM sets WHERE id = ?",
+
+    cursor.execute(
+        """
+        DELETE FROM sets
+        WHERE id = %s
+        """,
+
         (set_id,)
     )
+
 
     connection.commit()
+
+
+    cursor.close()
     connection.close()
 
+
     return {
-        "message": "Lug'at muvaffaqiyatli o'chirildi!"
+        "message":
+            "Lug'at muvaffaqiyatli o'chirildi!"
     }, 200
 
+
+# ==========================================
+# START SERVER
+# ==========================================
+
 if __name__ == "__main__":
-    app.run(debug=True)
+
+    app.run(
+        debug=True
+    )
+```
