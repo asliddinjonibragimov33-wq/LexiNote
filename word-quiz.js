@@ -34,7 +34,7 @@ async function loadQuizSets() {
 
         const response =
             await fetch(
-                `http://127.0.0.1:5000/sets?user_id=${quizUser.id}`
+                `https://lexinote-backend.onrender.com/sets?user_id=${quizUser.id}`
             );
 
 
@@ -202,7 +202,7 @@ function displayQuizSets(sets) {
 
                         const response =
                             await fetch(
-                                `http://127.0.0.1:5000/sets/${set.id}/words?user_id=${quizUser.id}`
+                                `https://lexinote-backend.onrender.com/sets/${set.id}/words?user_id=${quizUser.id}`
                             );
 
 
