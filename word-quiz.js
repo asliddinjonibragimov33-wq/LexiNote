@@ -1,19 +1,77 @@
+/* =========================
+   WORD QUIZ
+   ========================= */
+
+console.log("WORD-QUIZ JS ISHLADI!");
+
+/* =========================
+   BACKEND URL
+========================= */
+
+const API_URL =
+    "https://lexinote-backend.onrender.com";
+
+
+/* =========================
+   ELEMENTLAR
+========================= */
+
 const quizSetsList =
     document.getElementById("quiz-sets-list");
+
+
+/* =========================
+   ELEMENT TEKSHIRISH
+========================= */
+
+if (!quizSetsList) {
+
+    console.error(
+        "quiz-sets-list topilmadi!"
+    );
+
+}
 
 
 /* =========================
    LOGIN QILGAN USER
 ========================= */
 
-const quizUser = JSON.parse(
-    sessionStorage.getItem("currentUser")
-);
+/*
+   navbar.js ham currentUser bilan ishlaydi.
+   Bu faylda esa uni qayta o‘zimiz olamiz.
+*/
+
+let quizUser = null;
+
+try {
+
+    quizUser = JSON.parse(
+        sessionStorage.getItem("currentUser")
+    );
+
+} catch (error) {
+
+    console.error(
+        "currentUser JSON xatosi:",
+        error
+    );
+
+}
 
 
-if (!quizUser) {
+/* =========================
+   LOGIN TEKSHIRISH
+========================= */
 
-    alert("Avval tizimga kiring!");
+if (
+    !quizUser ||
+    !quizUser.id
+) {
+
+    alert(
+        "Avval tizimga kiring!"
+    );
 
     window.location.href =
         "login.html";
@@ -21,7 +79,19 @@ if (!quizUser) {
     throw new Error(
         "User login qilmagan."
     );
+
 }
+
+
+console.log(
+    "Quiz user:",
+    quizUser
+);
+
+console.log(
+    "Quiz user ID:",
+    quizUser.id
+);
 
 
 /* =========================
@@ -30,12 +100,23 @@ if (!quizUser) {
 
 async function loadQuizSets() {
 
+    console.log(
+        "loadQuizSets() ishga tushdi!"
+    );
+
+
     try {
 
         const response =
             await fetch(
-                `https://lexinote-backend.onrender.com/sets?user_id=${quizUser.id}`
+                `${API_URL}/sets?user_id=${encodeURIComponent(quizUser.id)}`
             );
+
+
+        console.log(
+            "Quiz sets response:",
+            response
+        );
 
 
         const data =
@@ -48,6 +129,10 @@ async function loadQuizSets() {
         );
 
 
+        /* =========================
+           SERVER JAVOBINI TEKSHIRISH
+        ========================= */
+
         if (!response.ok) {
 
             alert(
@@ -59,8 +144,12 @@ async function loadQuizSets() {
         }
 
 
+        /* =========================
+           SETLARNI KO‘RSATISH
+        ========================= */
+
         displayQuizSets(
-            data.sets
+            data.sets || []
         );
 
 
@@ -87,8 +176,17 @@ async function loadQuizSets() {
 
 function displayQuizSets(sets) {
 
+    if (!quizSetsList) {
+        return;
+    }
+
+
     quizSetsList.innerHTML = "";
 
+
+    /* =========================
+       SETLAR MAVJUD EMAS
+    ========================= */
 
     if (
         !sets ||
@@ -111,7 +209,9 @@ function displayQuizSets(sets) {
                     Avval lug‘at to‘plamini yarating.
                 </p>
 
-                <a href="add-word.html">
+                <a
+                    href="add-word.html"
+                >
                     + Lug‘at yaratish
                 </a>
 
@@ -120,9 +220,12 @@ function displayQuizSets(sets) {
         `;
 
         return;
-
     }
 
+
+    /* =========================
+       SETLARNI CHIQARISH
+    ========================= */
 
     sets.forEach(
         function(set) {
@@ -135,6 +238,10 @@ function displayQuizSets(sets) {
                 "quiz-set-card";
 
 
+            /* =========================
+               CARD
+            ========================= */
+
             card.innerHTML = `
 
                 <div class="quiz-set-icon">
@@ -143,15 +250,9 @@ function displayQuizSets(sets) {
 
                 <div class="quiz-set-info">
 
-                    <h3>
-                        ${set.title}
-                    </h3>
+                    <h3></h3>
 
-                    <p>
-                        📅 ${formatDate(set.date)}
-                        ·
-                        ${set.word_count} ta lug‘at
-                    </p>
+                    <p></p>
 
                 </div>
 
@@ -162,6 +263,31 @@ function displayQuizSets(sets) {
             `;
 
 
+            /*
+               innerHTML orqali title qo‘yish o‘rniga
+               textContent ishlatamiz.
+            */
+
+            const titleElement =
+                card.querySelector(
+                    ".quiz-set-info h3"
+                );
+
+
+            const infoElement =
+                card.querySelector(
+                    ".quiz-set-info p"
+                );
+
+
+            titleElement.textContent =
+                set.title || "Nomsiz lug‘at";
+
+
+            infoElement.textContent =
+                `📅 ${formatDate(set.date)} · ${Number(set.word_count) || 0} ta lug‘at`;
+
+
             /* =========================
                SETNI BOSISH
             ========================= */
@@ -170,8 +296,16 @@ function displayQuizSets(sets) {
                 "click",
                 async function() {
 
+                    const wordCount =
+                        Number(set.word_count) || 0;
+
+
+                    /* =========================
+                       BO‘SH SET
+                    ========================= */
+
                     if (
-                        set.word_count === 0
+                        wordCount === 0
                     ) {
 
                         alert(
@@ -179,30 +313,30 @@ function displayQuizSets(sets) {
                         );
 
                         return;
-
                     }
+
+
+                    /* =========================
+                       SETNI OCHISH
+                    ========================= */
+
+                    console.log(
+                        "Tanlangan set ID:",
+                        set.id
+                    );
+
+
+                    console.log(
+                        "Quiz user ID:",
+                        quizUser.id
+                    );
 
 
                     try {
 
-                        console.log(
-                            "Set ID:",
-                            set.id
-                        );
-
-                        console.log(
-                            "User ID:",
-                            quizUser.id
-                        );
-
-
-                        /* =========================
-                           SET SO‘ZLARINI OLISH
-                        ========================= */
-
                         const response =
                             await fetch(
-                                `https://lexinote-backend.onrender.com/sets/${set.id}/words?user_id=${quizUser.id}`
+                                `${API_URL}/sets/${set.id}/words?user_id=${encodeURIComponent(quizUser.id)}`
                             );
 
 
@@ -216,6 +350,10 @@ function displayQuizSets(sets) {
                         );
 
 
+                        /* =========================
+                           SERVER JAVOBI
+                        ========================= */
+
                         if (!response.ok) {
 
                             alert(
@@ -224,7 +362,26 @@ function displayQuizSets(sets) {
                             );
 
                             return;
+                        }
 
+
+                        /* =========================
+                           WORDS TEKSHIRISH
+                        ========================= */
+
+                        const words =
+                            data.words || [];
+
+
+                        if (
+                            words.length === 0
+                        ) {
+
+                            alert(
+                                "Bu to‘plamda hali lug‘atlar mavjud emas."
+                            );
+
+                            return;
                         }
 
 
@@ -247,9 +404,15 @@ function displayQuizSets(sets) {
                                 data.set.title,
 
                             words:
-                                data.words
+                                words
 
                         };
+
+
+                        console.log(
+                            "Quiz uchun tayyor set:",
+                            quizSet
+                        );
 
 
                         /* =========================
@@ -266,12 +429,12 @@ function displayQuizSets(sets) {
 
                         localStorage.setItem(
                             "quizSetId",
-                            set.id
+                            String(set.id)
                         );
 
 
                         /* =========================
-                           QUIZ SAHIFASI
+                           QUIZ SAHIFASIGA O‘TISH
                         ========================= */
 
                         window.location.href =
@@ -296,6 +459,10 @@ function displayQuizSets(sets) {
             );
 
 
+            /* =========================
+               LISTGA QO‘SHISH
+            ========================= */
+
             quizSetsList.appendChild(
                 card
             );
@@ -307,13 +474,37 @@ function displayQuizSets(sets) {
 
 
 /* =========================
-   SANANI FORMATLASH
+   SANA FORMATLASH
 ========================= */
 
 function formatDate(date) {
 
+    if (!date) {
+
+        return "Sana mavjud emas";
+
+    }
+
+
+    /*
+       Backend:
+       2026-08-24
+
+       Natija:
+       24.08.2026
+    */
+
     const parts =
-        date.split("-");
+        String(date).split("-");
+
+
+    if (
+        parts.length !== 3
+    ) {
+
+        return date;
+
+    }
 
 
     return (
