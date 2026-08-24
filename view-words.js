@@ -63,7 +63,7 @@ async function loadSet() {
 
         const response =
             await fetch(
-                `http://127.0.0.1:5000/sets/${selectedSetId}/words?user_id=${currentUser.id}`
+                `https://lexinote-backend.onrender.com/sets/${selectedSetId}/words?user_id=${currentUser.id}`
             );
 
 
@@ -319,7 +319,7 @@ function displayWords(words) {
 
                         const response =
                             await fetch(
-                                `http://127.0.0.1:5000/words/${item.id}`,
+                                `https://lexinote-backend.onrender.com/words/${item.id}`,
                                 {
                                     method:
                                         "DELETE"
