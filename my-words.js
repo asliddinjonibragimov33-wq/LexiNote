@@ -1,16 +1,23 @@
 console.log("MY-WORDS JS ISHLADI!");
 
+/* =========================
+   ELEMENTLAR
+========================= */
+
 const setsList =
     document.getElementById("sets-list");
 
 console.log("setsList:", setsList);
 
-const userId =
+
+/* =========================
+   LOGIN QILGAN USER
+========================= */
+
+const currentUser =
     JSON.parse(
         sessionStorage.getItem("currentUser")
-    ).id;
-
-console.log("currentUser:", currentUser);
+    );
 
 
 if (!currentUser) {
@@ -20,14 +27,29 @@ if (!currentUser) {
     window.location.href =
         "login.html";
 
-} else {
-
-    console.log(
-        "Login qilgan user ID:",
-        currentUser.id
+    throw new Error(
+        "User login qilmagan."
     );
-
 }
+
+
+console.log(
+    "Login qilgan user:",
+    currentUser
+);
+
+console.log(
+    "Login qilgan user ID:",
+    currentUser.id
+);
+
+
+/* =========================
+   BACKEND URL
+========================= */
+
+const API_URL =
+    "https://lexinote-backend.onrender.com";
 
 
 /* =========================
@@ -36,14 +58,17 @@ if (!currentUser) {
 
 async function loadSets() {
 
-    console.log("loadSets() ishga tushdi!");
+    console.log(
+        "loadSets() ishga tushdi!"
+    );
 
     try {
 
         const response =
             await fetch(
-                `https://lexinote-backend.onrender.com/sets?user_id=${currentUser.id}`
+                `${API_URL}/sets?user_id=${currentUser.id}`
             );
+
 
         console.log(
             "Backend response:",
@@ -54,11 +79,16 @@ async function loadSets() {
         const data =
             await response.json();
 
+
         console.log(
             "Backend data:",
             data
         );
 
+
+        /* =========================
+           SERVER JAVOBINI TEKSHIRISH
+        ========================= */
 
         if (!response.ok) {
 
@@ -71,7 +101,13 @@ async function loadSets() {
         }
 
 
-        displaySets(data.sets);
+        /* =========================
+           SETLARNI KO‘RSATISH
+        ========================= */
+
+        displaySets(
+            data.sets || []
+        );
 
 
     } catch (error) {
@@ -81,10 +117,13 @@ async function loadSets() {
             error
         );
 
+
         alert(
             "Server bilan bog‘lanib bo‘lmadi!"
         );
+
     }
+
 }
 
 
@@ -103,7 +142,14 @@ function displaySets(savedSets) {
     setsList.innerHTML = "";
 
 
-    if (savedSets.length === 0) {
+    /* =========================
+       SETLAR MAVJUD EMAS
+    ========================= */
+
+    if (
+        !savedSets ||
+        savedSets.length === 0
+    ) {
 
         setsList.innerHTML = `
 
@@ -137,161 +183,190 @@ function displaySets(savedSets) {
     }
 
 
-    savedSets.forEach(function(set) {
+    /* =========================
+       SETLARNI CHIQARISH
+    ========================= */
 
-        const card =
-            document.createElement("div");
+    savedSets.forEach(
+        function(set) {
 
-        card.className =
-            "set-card";
+            const card =
+                document.createElement(
+                    "div"
+                );
 
 
-        card.innerHTML = `
+            card.className =
+                "set-card";
 
-            <div class="set-card-icon">
-                📚
-            </div>
 
-            <div class="set-card-info">
+            card.innerHTML = `
 
-                <div class="set-card-date">
-                    📅 ${formatDate(set.date)}
+                <div class="set-card-icon">
+                    📚
                 </div>
 
-                <h2>
-                    ${set.title}
-                </h2>
+                <div class="set-card-info">
 
-                <p>
-                    ${set.word_count} ta lug‘at
-                </p>
+                    <div class="set-card-date">
+                        📅 ${formatDate(set.date)}
+                    </div>
 
-            </div>
+                    <h2>
+                        ${set.title}
+                    </h2>
 
-            <button
-                class="delete-set-button"
-                title="Lug‘atni o‘chirish"
-            >
-                🗑️
-            </button>
+                    <p>
+                        ${set.word_count} ta lug‘at
+                    </p>
 
-            <div class="set-card-arrow">
-                →
-            </div>
-        `;
+                </div>
 
+                <button
+                    class="delete-set-button"
+                    title="Lug‘atni o‘chirish"
+                >
+                    🗑️
+                </button>
 
-        /* =========================
-           O‘CHIRISH
-        ========================= */
+                <div class="set-card-arrow">
+                    →
+                </div>
 
-        const deleteButton =
-            card.querySelector(
-                ".delete-set-button"
-            );
+            `;
 
 
-        deleteButton.addEventListener(
-            "click",
-            async function(event) {
+            /* =========================
+               O‘CHIRISH TUGMASI
+            ========================= */
 
-                event.stopPropagation();
-
-
-                const confirmed =
-                    confirm(
-                        `"${set.title}" lug‘at to‘plamini o‘chirishni xohlaysizmi?`
-                    );
+            const deleteButton =
+                card.querySelector(
+                    ".delete-set-button"
+                );
 
 
-                if (!confirmed) {
-                    return;
-                }
+            deleteButton.addEventListener(
+                "click",
+                async function(event) {
+
+                    event.stopPropagation();
 
 
-                try {
-
-                    const response =
-                        await fetch(
-                            `https://lexinote-backend.onrender.com/sets/${set.id}`,
-                            {
-                                method: "DELETE"
-                            }
+                    const confirmed =
+                        confirm(
+                            `"${set.title}" lug‘at to‘plamini o‘chirishni xohlaysizmi?`
                         );
 
 
-                    const data =
-                        await response.json();
-
-
-                    if (!response.ok) {
-
-                        alert(
-                            data.error ||
-                            "Lug‘atni o‘chirishda xatolik!"
-                        );
-
+                    if (!confirmed) {
                         return;
                     }
 
 
-                    alert(data.message);
+                    try {
 
-                    loadSets();
+                        const response =
+                            await fetch(
+                                `${API_URL}/sets/${set.id}`,
+                                {
+                                    method: "DELETE"
+                                }
+                            );
 
 
-                } catch (error) {
+                        const data =
+                            await response.json();
 
-                    console.error(
-                        "Delete set error:",
-                        error
-                    );
 
-                    alert(
-                        "Server bilan bog‘lanib bo‘lmadi!"
-                    );
+                        console.log(
+                            "Delete set response:",
+                            data
+                        );
+
+
+                        if (!response.ok) {
+
+                            alert(
+                                data.error ||
+                                "Lug‘atni o‘chirishda xatolik!"
+                            );
+
+                            return;
+                        }
+
+
+                        alert(
+                            data.message ||
+                            "Lug‘at muvaffaqiyatli o‘chirildi!"
+                        );
+
+
+                        /* =========================
+                           RO‘YXATNI YANGILASH
+                        ========================= */
+
+                        loadSets();
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "Delete set error:",
+                            error
+                        );
+
+
+                        alert(
+                            "Server bilan bog‘lanib bo‘lmadi!"
+                        );
+
+                    }
+
                 }
-
-            }
-        );
+            );
 
 
-        /* =========================
-           SETNI OCHISH
-        ========================= */
+            /* =========================
+               SETNI OCHISH
+            ========================= */
 
-        card.addEventListener(
-            "click",
-            function() {
+            card.addEventListener(
+                "click",
+                function() {
 
-                localStorage.setItem(
-                    "selectedSetId",
-                    set.id
-                );
-
-
-                window.location.href =
-                    "view-words.html";
-
-            }
-        );
+                    localStorage.setItem(
+                        "selectedSetId",
+                        set.id
+                    );
 
 
-        setsList.appendChild(card);
+                    window.location.href =
+                        "view-words.html";
 
-    });
+                }
+            );
+
+
+            setsList.appendChild(
+                card
+            );
+
+        }
+    );
 
 }
 
 
 /* =========================
-   SANA
+   SANANI FORMATLASH
 ========================= */
 
 function formatDate(date) {
 
     const parts =
         date.split("-");
+
 
     return (
         parts[2] +
@@ -300,6 +375,7 @@ function formatDate(date) {
         "." +
         parts[0]
     );
+
 }
 
 
