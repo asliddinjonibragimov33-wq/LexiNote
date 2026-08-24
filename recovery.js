@@ -1,9 +1,23 @@
-const recoveryForm = document.getElementById("recovery-form");
+/* =========================
+   ELEMENTLAR
+========================= */
 
-const contactInput = document.getElementById("contact");
+const recoveryForm =
+    document.getElementById("recovery-form");
+
+const contactInput =
+    document.getElementById("contact");
 
 const recoveryMessage =
     document.getElementById("recovery-message");
+
+
+/* =========================
+   BACKEND URL
+========================= */
+
+const API_URL =
+    "https://lexinote-backend.onrender.com";
 
 
 /* =========================
@@ -18,6 +32,11 @@ if (!recoveryForm) {
 
 } else {
 
+
+    /* =========================
+       RECOVERY FORM
+    ========================= */
+
     recoveryForm.addEventListener(
         "submit",
         async function (event) {
@@ -25,9 +44,17 @@ if (!recoveryForm) {
             event.preventDefault();
 
 
+            /* =========================
+               CONTACT
+            ========================= */
+
             const contact =
                 contactInput.value.trim();
 
+
+            /* =========================
+               BO‘SH MAYDON
+            ========================= */
 
             if (!contact) {
 
@@ -38,11 +65,15 @@ if (!recoveryForm) {
             }
 
 
+            /* =========================
+               BACKENDGA SO‘ROV
+            ========================= */
+
             try {
 
                 const response =
                     await fetch(
-                        "https://lexinote-backend.onrender.com/forgot-password",
+                        `${API_URL}/forgot-password`,
                         {
                             method: "POST",
 
@@ -52,21 +83,32 @@ if (!recoveryForm) {
                             },
 
                             body: JSON.stringify({
-                                contact: contact
+
+                                contact:
+                                    contact
+
                             })
                         }
                     );
 
+
+                /* =========================
+                   BACKEND JAVOBI
+                ========================= */
 
                 const data =
                     await response.json();
 
 
                 console.log(
-                    "Backend javobi:",
+                    "Recovery backend javobi:",
                     data
                 );
 
+
+                /* =========================
+                   XATO
+                ========================= */
 
                 if (!response.ok) {
 
@@ -79,7 +121,7 @@ if (!recoveryForm) {
 
 
                 /* =========================
-                   KONTAKTNI SAQLASH
+                   CONTACTNI SAQLASH
                 ========================= */
 
                 sessionStorage.setItem(
@@ -96,9 +138,9 @@ if (!recoveryForm) {
                     "Tasdiqlash kodi yuborildi!";
 
 
-                /*
-                   VERIFY.HTML GA O‘TISH
-                */
+                /* =========================
+                   VERIFY SAHIFASI
+                ========================= */
 
                 setTimeout(
                     function () {
@@ -111,6 +153,11 @@ if (!recoveryForm) {
                 );
 
             }
+
+
+            /* =========================
+               SERVER XATOSI
+            ========================= */
 
             catch (error) {
 
