@@ -1,15 +1,43 @@
+console.log("EDIT-WORD JS ISHLADI!");
+
 /* =========================
-   LOGIN TEKSHIRISH
+   BACKEND URL
 ========================= */
+
+const API_URL =
+    "https://lexinote-backend.onrender.com";
+
+
+/* =========================
+   LOGIN QILGAN USER
+========================= */
+
+const currentUser =
+    JSON.parse(
+        sessionStorage.getItem("currentUser")
+    );
+
 
 if (!currentUser) {
 
-    alert("Avval tizimga kiring!");
+    alert(
+        "Avval tizimga kiring!"
+    );
 
     window.location.href =
         "login.html";
 
+    throw new Error(
+        "User login qilmagan."
+    );
+
 }
+
+
+console.log(
+    "Edit word user:",
+    currentUser
+);
 
 
 /* =========================
@@ -17,7 +45,9 @@ if (!currentUser) {
 ========================= */
 
 const editingWordId =
-    localStorage.getItem("editingWordId");
+    localStorage.getItem(
+        "editingWordId"
+    );
 
 
 if (!editingWordId) {
@@ -28,6 +58,36 @@ if (!editingWordId) {
 
     window.location.href =
         "my-words.html";
+
+    throw new Error(
+        "editingWordId topilmadi."
+    );
+
+}
+
+
+/* =========================
+   SET ID
+========================= */
+
+const selectedSetId =
+    localStorage.getItem(
+        "selectedSetId"
+    );
+
+
+if (!selectedSetId) {
+
+    alert(
+        "Lug‘at to‘plami topilmadi."
+    );
+
+    window.location.href =
+        "my-words.html";
+
+    throw new Error(
+        "selectedSetId topilmadi."
+    );
 
 }
 
@@ -67,36 +127,71 @@ const exampleInput =
 
 
 /* =========================
-   BACKENDDAN SO‘ZNI TOPISH
+   ELEMENTLARNI TEKSHIRISH
+========================= */
+
+if (
+    !editWordForm ||
+    !wordInput ||
+    !translationInput ||
+    !definitionInput ||
+    !exampleInput
+) {
+
+    console.error(
+        "Edit word elementlaridan biri topilmadi."
+    );
+
+    throw new Error(
+        "HTML elementlari topilmadi."
+    );
+
+}
+
+
+/* =========================
+   BACKENDDAN SO‘ZNI OLISH
 ========================= */
 
 async function loadWord() {
 
+    console.log(
+        "Tahrirlanadigan word ID:",
+        editingWordId
+    );
+
+
+    console.log(
+        "Tanlangan set ID:",
+        selectedSetId
+    );
+
+
     try {
 
-        const setId =
-            localStorage.getItem(
-                "selectedSetId"
-            );
+        /* =========================
+           LOADING
+        ========================= */
 
+        wordInput.disabled = true;
 
-        if (!setId) {
+        translationInput.disabled = true;
 
-            alert(
-                "Lug‘at to‘plami topilmadi."
-            );
+        definitionInput.disabled = true;
 
-            window.location.href =
-                "my-words.html";
-
-            return;
-        }
+        exampleInput.disabled = true;
 
 
         const response =
             await fetch(
-                `https://lexinote-backend.onrender.com/sets/${setId}/words?user_id=${currentUser.id}`
+                `${API_URL}/sets/${encodeURIComponent(selectedSetId)}/words?user_id=${encodeURIComponent(currentUser.id)}`
             );
+
+
+        console.log(
+            "Load word response:",
+            response
+        );
 
 
         const data =
@@ -109,6 +204,10 @@ async function loadWord() {
         );
 
 
+        /* =========================
+           BACKEND XATOSI
+        ========================= */
+
         if (!response.ok) {
 
             alert(
@@ -116,22 +215,38 @@ async function loadWord() {
                 "So‘zlarni yuklashda xatolik!"
             );
 
+            window.location.href =
+                "view-words.html";
+
             return;
+
         }
 
 
-        const word =
-            data.words.find(
-                function(item) {
+        /* =========================
+           WORDS TEKSHIRISH
+        ========================= */
 
-                    return (
-                        item.id ==
-                        editingWordId
-                    );
+        const words =
+            Array.isArray(data.words)
+                ? data.words
+                : [];
+
+
+        const word =
+            words.find(
+                function (item) {
+
+                    return String(item.id) ===
+                        String(editingWordId);
 
                 }
             );
 
+
+        /* =========================
+           SO‘Z TOPILMADI
+        ========================= */
 
         if (!word) {
 
@@ -143,6 +258,7 @@ async function loadWord() {
                 "view-words.html";
 
             return;
+
         }
 
 
@@ -151,11 +267,11 @@ async function loadWord() {
         ========================= */
 
         wordInput.value =
-            word.word;
+            word.word || "";
 
 
         translationInput.value =
-            word.translation;
+            word.translation || "";
 
 
         definitionInput.value =
@@ -164,6 +280,19 @@ async function loadWord() {
 
         exampleInput.value =
             word.example || "";
+
+
+        /* =========================
+           INPUTLARNI YOQISH
+        ========================= */
+
+        wordInput.disabled = false;
+
+        translationInput.disabled = false;
+
+        definitionInput.disabled = false;
+
+        exampleInput.disabled = false;
 
 
     } catch (error) {
@@ -178,21 +307,29 @@ async function loadWord() {
             "Server bilan bog‘lanib bo‘lmadi!"
         );
 
+
+        window.location.href =
+            "view-words.html";
+
     }
 
 }
 
 
 /* =========================
-   SAQLASH
+   SO‘ZNI YANGILASH
 ========================= */
 
 editWordForm.addEventListener(
     "submit",
-    async function(event) {
+    async function (event) {
 
         event.preventDefault();
 
+
+        /* =========================
+           INPUTLARDAN MA'LUMOT OLISH
+        ========================= */
 
         const word =
             wordInput.value.trim();
@@ -224,6 +361,25 @@ editWordForm.addEventListener(
             );
 
             return;
+
+        }
+
+
+        /* =========================
+           SAQLASH TUGMASINI TOPISH
+        ========================= */
+
+        const submitButton =
+            editWordForm.querySelector(
+                'button[type="submit"]'
+            );
+
+
+        if (submitButton) {
+
+            submitButton.disabled =
+                true;
+
         }
 
 
@@ -231,7 +387,7 @@ editWordForm.addEventListener(
 
             const response =
                 await fetch(
-                    `https://lexinote-backend.onrender.com/words/${editingWordId}`,
+                    `${API_URL}/words/${encodeURIComponent(editingWordId)}`,
                     {
                         method: "PUT",
 
@@ -255,6 +411,7 @@ editWordForm.addEventListener(
                                 example
 
                         })
+
                     }
                 );
 
@@ -269,6 +426,10 @@ editWordForm.addEventListener(
             );
 
 
+            /* =========================
+               XATO
+            ========================= */
+
             if (!response.ok) {
 
                 alert(
@@ -276,21 +437,46 @@ editWordForm.addEventListener(
                     "So‘zni yangilashda xatolik!"
                 );
 
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        false;
+
+                }
+
+
                 return;
+
             }
 
 
+            /* =========================
+               MUVAFFAQIYAT
+            ========================= */
+
             alert(
-                data.message
+                data.message ||
+                "So‘z muvaffaqiyatli yangilandi!"
             );
 
 
             /* =========================
-               TOZALASH
+               EDITING ID NI TOZALASH
             ========================= */
 
             localStorage.removeItem(
                 "editingWordId"
+            );
+
+
+            /* =========================
+               SET ID QOLADI
+            ========================= */
+
+            localStorage.setItem(
+                "selectedSetId",
+                selectedSetId
             );
 
 
@@ -313,6 +499,14 @@ editWordForm.addEventListener(
             alert(
                 "Server bilan bog‘lanib bo‘lmadi!"
             );
+
+
+            if (submitButton) {
+
+                submitButton.disabled =
+                    false;
+
+            }
 
         }
 
