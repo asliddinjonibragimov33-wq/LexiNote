@@ -95,7 +95,7 @@ async function loadWord() {
 
         const response =
             await fetch(
-                `http://127.0.0.1:5000/sets/${setId}/words?user_id=${currentUser.id}`
+                `https://lexinote-backend.onrender.com/sets/${setId}/words?user_id=${currentUser.id}`
             );
 
 
@@ -231,7 +231,7 @@ editWordForm.addEventListener(
 
             const response =
                 await fetch(
-                    `http://127.0.0.1:5000/words/${editingWordId}`,
+                    `https://lexinote-backend.onrender.com/words/${editingWordId}`,
                     {
                         method: "PUT",
 
