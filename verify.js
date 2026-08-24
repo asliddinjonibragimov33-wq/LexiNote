@@ -79,7 +79,7 @@ if (!verifyForm) {
 
                 const response =
                     await fetch(
-                        "http://127.0.0.1:5000/verify-code",
+                        "https://lexinote-backend.onrender.com/verify-code",
                         {
                             method: "POST",
 
