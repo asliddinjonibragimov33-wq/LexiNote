@@ -92,7 +92,7 @@ async function loadWords() {
     try {
 
         const response = await fetch(
-            `http://127.0.0.1:5000/sets/${currentSet.id}/words`
+            `https://lexinote-backend.onrender.com/sets/${currentSet.id}/words`
         );
 
         const data = await response.json();
@@ -166,7 +166,7 @@ wordForm.addEventListener(
         try {
 
             const response = await fetch(
-                `http://127.0.0.1:5000/sets/${currentSet.id}/words`,
+                `https://lexinote-backend.onrender.com/sets/${currentSet.id}/words`,
                 {
                     method: "POST",
 
@@ -373,7 +373,7 @@ async function deleteWord(wordId) {
 
         const response =
             await fetch(
-                `http://127.0.0.1:5000/words/${wordId}`,
+                `https://lexinote-backend.onrender.com/words/${wordId}`,
                 {
                     method: "DELETE"
                 }
