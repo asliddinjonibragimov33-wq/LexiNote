@@ -1,100 +1,171 @@
-const loginForm = document.getElementById("loginForm");
+/* =========================
+   LOGIN FORM
+========================= */
 
-loginForm.addEventListener("submit", async function (event) {
-    event.preventDefault();
+const loginForm =
+    document.getElementById("loginForm");
 
-    const username =
-        document.getElementById("username").value.trim();
 
-    const password =
-        document.getElementById("password").value;
+/* =========================
+   BACKEND URL
+========================= */
 
-    // Bo'sh maydonlarni tekshirish
-    if (!username || !password) {
-        alert("Login va parolni kiriting!");
-        return;
-    }
+const API_URL =
+    "https://lexinote-backend.onrender.com";
 
-    try {
 
-        const response = await fetch(
-            "https://lexinote-backend.onrender.com/login",
-            {
-                method: "POST",
+/* =========================
+   LOGIN
+========================= */
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+loginForm.addEventListener(
+    "submit",
+    async function (event) {
 
-                body: JSON.stringify({
-                    username: username,
-                    password: password
-                })
+        event.preventDefault();
+
+
+        /* =========================
+           INPUTLAR
+        ========================= */
+
+        const username =
+            document
+                .getElementById("username")
+                .value
+                .trim();
+
+
+        const password =
+            document
+                .getElementById("password")
+                .value;
+
+
+        /* =========================
+           BO‘SH MAYDONLAR
+        ========================= */
+
+        if (!username || !password) {
+
+            alert(
+                "Login va parolni kiriting!"
+            );
+
+            return;
+        }
+
+
+        /* =========================
+           BACKENDGA SO‘ROV
+        ========================= */
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/login`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            username:
+                                username,
+
+                            password:
+                                password
+
+                        })
+                    }
+                );
+
+
+            /* =========================
+               JSON JAVOB
+            ========================= */
+
+            const result =
+                await response.json();
+
+
+            console.log(
+                "Login backend javobi:",
+                result
+            );
+
+
+            /* =========================
+               LOGIN MUVAFFAQIYATLI
+            ========================= */
+
+            if (response.ok) {
+
+                /* =========================
+                   USERNI SAQLASH
+                ========================= */
+
+                sessionStorage.setItem(
+                    "currentUser",
+                    JSON.stringify(
+                        result.user
+                    )
+                );
+
+
+                alert(
+                    "Kirish muvaffaqiyatli!"
+                );
+
+
+                /* =========================
+                   DASHBOARD
+                ========================= */
+
+                window.location.href =
+                    "dashboard.html";
+
             }
-        );
 
 
-        const result =
-            await response.json();
+            /* =========================
+               LOGIN XATO
+            ========================= */
 
+            else {
 
-        /* =========================
-           LOGIN MUVAFFAQIYATLI
-        ========================= */
+                alert(
+                    result.error ||
+                    "Login yoki parol noto‘g‘ri!"
+                );
 
-        if (response.ok) {
-
-            // Foydalanuvchi ma'lumotlarini
-            // sessionStorage'da saqlaymiz
-            sessionStorage.setItem(
-                "currentUser",
-                JSON.stringify(result.user)
-            );
-
-
-            alert(
-                "Kirish muvaffaqiyatli!"
-            );
-
-
-            // Dashboard'ga o'tamiz
-            window.location.href =
-                "dashboard.html";
+            }
 
         }
 
 
         /* =========================
-           LOGIN XATO
+           SERVER XATOSI
         ========================= */
 
-        else {
+        catch (error) {
+
+            console.error(
+                "Login xatosi:",
+                error
+            );
+
 
             alert(
-                result.error ||
-                "Login yoki parol noto'g'ri!"
+                "Server bilan bog‘lanib bo‘lmadi!"
             );
 
         }
 
     }
-
-
-    /* =========================
-       SERVER XATOSI
-    ========================= */
-
-    catch (error) {
-
-        console.error(
-            "Login xatosi:",
-            error
-        );
-
-        alert(
-            "Server bilan bog'lanib bo'lmadi!"
-        );
-
-    }
-
-});
+);
