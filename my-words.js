@@ -1,13 +1,32 @@
 console.log("MY-WORDS JS ISHLADI!");
 
 /* =========================
+   BACKEND URL
+========================= */
+
+const API_URL =
+    "https://lexinote-backend.onrender.com";
+
+
+/* =========================
    ELEMENTLAR
 ========================= */
 
 const setsList =
     document.getElementById("sets-list");
 
-console.log("setsList:", setsList);
+
+if (!setsList) {
+
+    console.error(
+        "sets-list elementi topilmadi!"
+    );
+
+    throw new Error(
+        "sets-list mavjud emas."
+    );
+
+}
 
 
 /* =========================
@@ -22,7 +41,9 @@ const currentUser =
 
 if (!currentUser) {
 
-    alert("Avval tizimga kiring!");
+    alert(
+        "Avval tizimga kiring!"
+    );
 
     window.location.href =
         "login.html";
@@ -30,6 +51,7 @@ if (!currentUser) {
     throw new Error(
         "User login qilmagan."
     );
+
 }
 
 
@@ -38,22 +60,9 @@ console.log(
     currentUser
 );
 
-console.log(
-    "Login qilgan user ID:",
-    currentUser.id
-);
-
 
 /* =========================
-   BACKEND URL
-========================= */
-
-const API_URL =
-    "https://lexinote-backend.onrender.com";
-
-
-/* =========================
-   BACKENDDAN SETLARNI OLISH
+   SETLARNI BACKENDDAN OLISH
 ========================= */
 
 async function loadSets() {
@@ -62,11 +71,33 @@ async function loadSets() {
         "loadSets() ishga tushdi!"
     );
 
+
+    /* =========================
+       LOADING
+    ========================= */
+
+    setsList.innerHTML = `
+
+        <div class="loading-sets">
+
+            <div class="empty-icon">
+                📚
+            </div>
+
+            <p>
+                Lug‘atlar yuklanmoqda...
+            </p>
+
+        </div>
+
+    `;
+
+
     try {
 
         const response =
             await fetch(
-                `${API_URL}/sets?user_id=${currentUser.id}`
+                `${API_URL}/sets?user_id=${encodeURIComponent(currentUser.id)}`
             );
 
 
@@ -87,7 +118,7 @@ async function loadSets() {
 
 
         /* =========================
-           SERVER JAVOBINI TEKSHIRISH
+           BACKEND XATOSI
         ========================= */
 
         if (!response.ok) {
@@ -102,7 +133,7 @@ async function loadSets() {
 
 
         /* =========================
-           SETLARNI KO‘RSATISH
+           SETLARNI CHIQARISH
         ========================= */
 
         displaySets(
@@ -118,9 +149,49 @@ async function loadSets() {
         );
 
 
-        alert(
-            "Server bilan bog‘lanib bo‘lmadi!"
-        );
+        setsList.innerHTML = `
+
+            <div class="empty-sets">
+
+                <div class="empty-icon">
+                    ⚠️
+                </div>
+
+                <h2>
+                    Server bilan bog‘lanib bo‘lmadi
+                </h2>
+
+                <p>
+                    Internet aloqangizni tekshirib,
+                    qaytadan urinib ko‘ring.
+                </p>
+
+                <button
+                    class="new-word-btn"
+                    id="retry-load-sets"
+                >
+                    🔄 Qayta urinish
+                </button>
+
+            </div>
+
+        `;
+
+
+        const retryButton =
+            document.getElementById(
+                "retry-load-sets"
+            );
+
+
+        if (retryButton) {
+
+            retryButton.addEventListener(
+                "click",
+                loadSets
+            );
+
+        }
 
     }
 
@@ -134,7 +205,7 @@ async function loadSets() {
 function displaySets(savedSets) {
 
     console.log(
-        "displaySets() ishga tushdi:",
+        "displaySets():",
         savedSets
     );
 
@@ -143,11 +214,11 @@ function displaySets(savedSets) {
 
 
     /* =========================
-       SETLAR MAVJUD EMAS
+       SETLAR YO‘Q
     ========================= */
 
     if (
-        !savedSets ||
+        !Array.isArray(savedSets) ||
         savedSets.length === 0
     ) {
 
@@ -188,7 +259,7 @@ function displaySets(savedSets) {
     ========================= */
 
     savedSets.forEach(
-        function(set) {
+        function (set) {
 
             const card =
                 document.createElement(
@@ -206,30 +277,41 @@ function displaySets(savedSets) {
                     📚
                 </div>
 
+
                 <div class="set-card-info">
 
                     <div class="set-card-date">
                         📅 ${formatDate(set.date)}
                     </div>
 
+
                     <h2>
-                        ${set.title}
+                        ${escapeHTML(set.title)}
                     </h2>
 
+
                     <p>
-                        ${set.word_count} ta lug‘at
+                        ${Number(set.word_count) || 0}
+                        ta lug‘at
                     </p>
 
                 </div>
 
+
                 <button
+                    type="button"
                     class="delete-set-button"
                     title="Lug‘atni o‘chirish"
+                    aria-label="Lug‘atni o‘chirish"
                 >
                     🗑️
                 </button>
 
-                <div class="set-card-arrow">
+
+                <div
+                    class="set-card-arrow"
+                    aria-hidden="true"
+                >
                     →
                 </div>
 
@@ -237,7 +319,7 @@ function displaySets(savedSets) {
 
 
             /* =========================
-               O‘CHIRISH TUGMASI
+               O‘CHIRISH
             ========================= */
 
             const deleteButton =
@@ -248,7 +330,7 @@ function displaySets(savedSets) {
 
             deleteButton.addEventListener(
                 "click",
-                async function(event) {
+                async function (event) {
 
                     event.stopPropagation();
 
@@ -260,8 +342,18 @@ function displaySets(savedSets) {
 
 
                     if (!confirmed) {
+
                         return;
+
                     }
+
+
+                    /* =========================
+                       DELETE BUTTON HOLATI
+                    ========================= */
+
+                    deleteButton.disabled =
+                        true;
 
 
                     try {
@@ -292,6 +384,9 @@ function displaySets(savedSets) {
                                 "Lug‘atni o‘chirishda xatolik!"
                             );
 
+                            deleteButton.disabled =
+                                false;
+
                             return;
                         }
 
@@ -303,10 +398,32 @@ function displaySets(savedSets) {
 
 
                         /* =========================
+                           TANLANGAN SETNI TOZALASH
+                        ========================= */
+
+                        const selectedSetId =
+                            localStorage.getItem(
+                                "selectedSetId"
+                            );
+
+
+                        if (
+                            String(selectedSetId) ===
+                            String(set.id)
+                        ) {
+
+                            localStorage.removeItem(
+                                "selectedSetId"
+                            );
+
+                        }
+
+
+                        /* =========================
                            RO‘YXATNI YANGILASH
                         ========================= */
 
-                        loadSets();
+                        await loadSets();
 
 
                     } catch (error) {
@@ -321,6 +438,10 @@ function displaySets(savedSets) {
                             "Server bilan bog‘lanib bo‘lmadi!"
                         );
 
+
+                        deleteButton.disabled =
+                            false;
+
                     }
 
                 }
@@ -333,7 +454,7 @@ function displaySets(savedSets) {
 
             card.addEventListener(
                 "click",
-                function() {
+                function () {
 
                     localStorage.setItem(
                         "selectedSetId",
@@ -364,8 +485,22 @@ function displaySets(savedSets) {
 
 function formatDate(date) {
 
+    if (!date) {
+
+        return "—";
+
+    }
+
+
     const parts =
         date.split("-");
+
+
+    if (parts.length !== 3) {
+
+        return date;
+
+    }
 
 
     return (
@@ -375,6 +510,27 @@ function formatDate(date) {
         "." +
         parts[0]
     );
+
+}
+
+
+/* =========================
+   XAVFSIZ HTML
+========================= */
+
+function escapeHTML(value) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        value ?? "";
+
+
+    return div.innerHTML;
 
 }
 
