@@ -1,21 +1,73 @@
 /* =========================
+   QUIZ JS
+========================= */
+
+console.log("QUIZ JS ISHLADI!");
+
+
+/* =========================
+   BACKEND URL
+========================= */
+
+const API_URL =
+    "https://lexinote-backend.onrender.com";
+
+
+/* =========================
    LOGIN QILGAN USER
 ========================= */
 
-const quizUser = JSON.parse(
-    sessionStorage.getItem("currentUser")
-);
+let quizUser = null;
 
 
-if (!quizUser) {
+try {
 
-    alert("Avval tizimga kiring!");
+    quizUser = JSON.parse(
+        sessionStorage.getItem("currentUser")
+    );
 
-    window.location.href = "login.html";
+} catch (error) {
 
-    throw new Error("User login qilmagan.");
+    console.error(
+        "currentUser JSON xatosi:",
+        error
+    );
 
 }
+
+
+/* =========================
+   LOGIN TEKSHIRISH
+========================= */
+
+if (
+    !quizUser ||
+    !quizUser.id
+) {
+
+    alert(
+        "Avval tizimga kiring!"
+    );
+
+    window.location.href =
+        "login.html";
+
+    throw new Error(
+        "User login qilmagan."
+    );
+
+}
+
+
+console.log(
+    "Quiz user:",
+    quizUser
+);
+
+console.log(
+    "Quiz user ID:",
+    quizUser.id
+);
 
 
 /* =========================
@@ -35,7 +87,9 @@ if (!quizSetId) {
     window.location.href =
         "word-quiz.html";
 
-    throw new Error("Quiz set ID topilmadi.");
+    throw new Error(
+        "Quiz set ID topilmadi."
+    );
 
 }
 
@@ -45,40 +99,105 @@ if (!quizSetId) {
 ========================= */
 
 const questionWord =
-    document.getElementById("question-word");
+    document.getElementById(
+        "question-word"
+    );
+
 
 const answerInput =
-    document.getElementById("answer-input");
+    document.getElementById(
+        "answer-input"
+    );
+
 
 const checkButton =
-    document.getElementById("check-button");
+    document.getElementById(
+        "check-button"
+    );
+
 
 const nextButton =
-    document.getElementById("next-button");
+    document.getElementById(
+        "next-button"
+    );
+
 
 const resultMessage =
-    document.getElementById("result-message");
+    document.getElementById(
+        "result-message"
+    );
+
 
 const questionNumber =
-    document.getElementById("question-number");
+    document.getElementById(
+        "question-number"
+    );
+
 
 const totalQuestions =
-    document.getElementById("total-questions");
+    document.getElementById(
+        "total-questions"
+    );
+
 
 const quizSetName =
-    document.getElementById("quiz-set-name");
+    document.getElementById(
+        "quiz-set-name"
+    );
+
 
 const finishButton =
-    document.getElementById("finish-button");
+    document.getElementById(
+        "finish-button"
+    );
+
 
 const quizCard =
-    document.querySelector(".quiz-card");
+    document.querySelector(
+        ".quiz-card"
+    );
+
 
 const quizResult =
-    document.getElementById("quiz-result");
+    document.getElementById(
+        "quiz-result"
+    );
+
 
 const reverseButton =
-    document.getElementById("reverse-button");
+    document.getElementById(
+        "reverse-button"
+    );
+
+
+/* =========================
+   ELEMENTLARNI TEKSHIRISH
+========================= */
+
+if (
+    !questionWord ||
+    !answerInput ||
+    !checkButton ||
+    !nextButton ||
+    !resultMessage ||
+    !questionNumber ||
+    !totalQuestions ||
+    !quizSetName ||
+    !finishButton ||
+    !quizCard ||
+    !quizResult ||
+    !reverseButton
+) {
+
+    console.error(
+        "Quiz HTML elementlaridan biri topilmadi."
+    );
+
+    throw new Error(
+        "Quiz elementlari topilmadi."
+    );
+
+}
 
 
 /* =========================
@@ -101,10 +220,15 @@ let reverseMode = false;
 
 
 /* =========================
-   BACKENDDAN QUIZ MA'LUMOTLARINI OLISH
+   BACKENDDAN QUIZNI OLISH
 ========================= */
 
 async function loadQuiz() {
+
+    console.log(
+        "loadQuiz() ishga tushdi!"
+    );
+
 
     try {
 
@@ -116,8 +240,14 @@ async function loadQuiz() {
 
         const response =
             await fetch(
-                `https://lexinote-backend.onrender.com/sets/${quizSetId}/words?user_id=${quizUser.id}`
+                `${API_URL}/sets/${quizSetId}/words?user_id=${encodeURIComponent(quizUser.id)}`
             );
+
+
+        console.log(
+            "Quiz backend response:",
+            response
+        );
 
 
         const data =
@@ -130,6 +260,10 @@ async function loadQuiz() {
         );
 
 
+        /* =========================
+           RESPONSE TEKSHIRISH
+        ========================= */
+
         if (!response.ok) {
 
             alert(
@@ -141,7 +275,6 @@ async function loadQuiz() {
                 "word-quiz.html";
 
             return;
-
         }
 
 
@@ -153,12 +286,27 @@ async function loadQuiz() {
             data.set;
 
 
+        if (!quizSet) {
+
+            alert(
+                "Quiz to‘plami topilmadi."
+            );
+
+            window.location.href =
+                "word-quiz.html";
+
+            return;
+        }
+
+
         /* =========================
            SO‘ZLAR
         ========================= */
 
         quizWords =
-            data.words || [];
+            Array.isArray(data.words)
+                ? data.words
+                : [];
 
 
         /* =========================
@@ -177,7 +325,6 @@ async function loadQuiz() {
                 "word-quiz.html";
 
             return;
-
         }
 
 
@@ -185,12 +332,8 @@ async function loadQuiz() {
            TASODIFIY TARTIB
         ========================= */
 
-        quizWords.sort(
-            function () {
-
-                return Math.random() - 0.5;
-
-            }
+        shuffleArray(
+            quizWords
         );
 
 
@@ -203,7 +346,20 @@ async function loadQuiz() {
 
 
         quizSetName.textContent =
-            quizSet.title;
+            quizSet.title || "Quiz";
+
+
+        /* =========================
+           NATIJANI BOSHLASH
+        ========================= */
+
+        currentIndex = 0;
+
+        correctCount = 0;
+
+        incorrectCount = 0;
+
+        wrongAnswers = [];
 
 
         /* =========================
@@ -231,6 +387,37 @@ async function loadQuiz() {
 
 
 /* =========================
+   TASODIFIY ARALASHTIRISH
+========================= */
+
+function shuffleArray(array) {
+
+    for (
+        let i = array.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const randomIndex =
+            Math.floor(
+                Math.random() * (i + 1)
+            );
+
+
+        [
+            array[i],
+            array[randomIndex]
+        ] = [
+            array[randomIndex],
+            array[i]
+        ];
+
+    }
+
+}
+
+
+/* =========================
    SAVOLNI KO‘RSATISH
 ========================= */
 
@@ -241,6 +428,9 @@ function showQuestion() {
 
 
     if (!currentWord) {
+
+        finishQuiz();
+
         return;
     }
 
@@ -263,11 +453,15 @@ function showQuestion() {
 
 
     /* =========================
-       RAQAM
+       SAVOL RAQAMI
     ========================= */
 
     questionNumber.textContent =
         currentIndex + 1;
+
+
+    totalQuestions.textContent =
+        quizWords.length;
 
 
     /* =========================
@@ -304,13 +498,17 @@ function showQuestion() {
         "none";
 
 
+    /* =========================
+       INPUTGA FOCUS
+    ========================= */
+
     answerInput.focus();
 
 }
 
 
 /* =========================
-   REVERSE
+   REVERSE MODE
 ========================= */
 
 reverseButton.addEventListener(
@@ -333,120 +531,156 @@ reverseButton.addEventListener(
 
 checkButton.addEventListener(
     "click",
-    function () {
-
-        const currentWord =
-            quizWords[currentIndex];
+    checkAnswer
+);
 
 
-        const userAnswer =
-            answerInput.value
-                .trim()
-                .toLowerCase();
+/* =========================
+   ENTER BILAN TEKSHIRISH
+========================= */
 
-
-        /* =========================
-           BO‘SH JAVOB
-        ========================= */
-
-        if (!userAnswer) {
-
-            resultMessage.textContent =
-                "Avval javobingizni yozing.";
-
-            resultMessage.className =
-                "result-message warning";
-
-            return;
-
-        }
-
-
-        /* =========================
-           TO‘G‘RI JAVOB
-        ========================= */
-
-        const correctAnswer =
-            reverseMode
-                ? currentWord.word
-                : currentWord.translation;
-
-
-        const normalizedCorrectAnswer =
-            correctAnswer
-                .trim()
-                .toLowerCase();
-
-
-        /* =========================
-           TO‘G‘RI
-        ========================= */
+answerInput.addEventListener(
+    "keydown",
+    function (event) {
 
         if (
-            userAnswer ===
-            normalizedCorrectAnswer
+            event.key === "Enter" &&
+            !checkButton.disabled
         ) {
 
-            correctCount++;
+            event.preventDefault();
 
-
-            resultMessage.textContent =
-                "✓ To‘g‘ri!";
-
-
-            resultMessage.className =
-                "result-message correct";
+            checkAnswer();
 
         }
-
-
-        /* =========================
-           NOTO‘G‘RI
-        ========================= */
-
-        else {
-
-            incorrectCount++;
-
-
-            wrongAnswers.push({
-
-                word:
-                    currentWord.word,
-
-                userAnswer:
-                    answerInput.value.trim(),
-
-                correctAnswer:
-                    correctAnswer
-
-            });
-
-
-            resultMessage.textContent =
-                "✗ Noto‘g‘ri! To‘g‘ri javob: " +
-                correctAnswer;
-
-
-            resultMessage.className =
-                "result-message incorrect";
-
-        }
-
-
-        /* =========================
-           JAVOBDAN KEYIN
-        ========================= */
-
-        answerInput.disabled = true;
-
-        checkButton.disabled = true;
-
-        nextButton.style.display =
-            "block";
 
     }
 );
+
+
+/* =========================
+   JAVOBNI TEKSHIRISH
+========================= */
+
+function checkAnswer() {
+
+    const currentWord =
+        quizWords[currentIndex];
+
+
+    if (!currentWord) {
+        return;
+    }
+
+
+    const userAnswer =
+        answerInput.value
+            .trim()
+            .toLowerCase();
+
+
+    /* =========================
+       BO‘SH JAVOB
+    ========================= */
+
+    if (!userAnswer) {
+
+        resultMessage.textContent =
+            "Avval javobingizni yozing.";
+
+        resultMessage.className =
+            "result-message warning";
+
+        answerInput.focus();
+
+        return;
+    }
+
+
+    /* =========================
+       TO‘G‘RI JAVOB
+    ========================= */
+
+    const correctAnswer =
+        reverseMode
+            ? currentWord.word
+            : currentWord.translation;
+
+
+    const normalizedCorrectAnswer =
+        String(correctAnswer)
+            .trim()
+            .toLowerCase();
+
+
+    /* =========================
+       TO‘G‘RI
+    ========================= */
+
+    if (
+        userAnswer ===
+        normalizedCorrectAnswer
+    ) {
+
+        correctCount++;
+
+
+        resultMessage.textContent =
+            "✓ To‘g‘ri!";
+
+
+        resultMessage.className =
+            "result-message correct";
+
+    }
+
+
+    /* =========================
+       NOTO‘G‘RI
+    ========================= */
+
+    else {
+
+        incorrectCount++;
+
+
+        wrongAnswers.push({
+
+            word:
+                currentWord.word,
+
+            userAnswer:
+                answerInput.value.trim(),
+
+            correctAnswer:
+                correctAnswer
+
+        });
+
+
+        resultMessage.textContent =
+            "✗ Noto‘g‘ri! To‘g‘ri javob: " +
+            correctAnswer;
+
+
+        resultMessage.className =
+            "result-message incorrect";
+
+    }
+
+
+    /* =========================
+       JAVOBDAN KEYIN
+    ========================= */
+
+    answerInput.disabled = true;
+
+    checkButton.disabled = true;
+
+    nextButton.style.display =
+        "block";
+
+}
 
 
 /* =========================
@@ -468,7 +702,6 @@ nextButton.addEventListener(
             finishQuiz();
 
             return;
-
         }
 
 
@@ -508,6 +741,16 @@ finishButton.addEventListener(
 ========================= */
 
 function finishQuiz() {
+
+    if (
+        !quizCard ||
+        !quizResult
+    ) {
+
+        return;
+
+    }
+
 
     quizCard.style.display =
         "none";
@@ -568,33 +811,65 @@ function finishQuiz() {
         wrongAnswers.forEach(
             function (item) {
 
-                wrongWordsHTML += `
+                const wrongCard =
+                    document.createElement(
+                        "div"
+                    );
 
-                    <div
-                        class="wrong-word-card"
-                    >
 
-                        <h3>
-                            ${item.word}
-                        </h3>
+                wrongCard.className =
+                    "wrong-word-card";
 
-                        <p>
-                            Sizning javobingiz:
-                            <strong>
-                                ${item.userAnswer}
-                            </strong>
-                        </p>
 
-                        <p>
-                            To‘g‘ri javob:
-                            <strong>
-                                ${item.correctAnswer}
-                            </strong>
-                        </p>
+                const wordTitle =
+                    document.createElement(
+                        "h3"
+                    );
 
-                    </div>
 
-                `;
+                wordTitle.textContent =
+                    item.word;
+
+
+                const userAnswerText =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                userAnswerText.textContent =
+                    "Sizning javobingiz: " +
+                    item.userAnswer;
+
+
+                const correctAnswerText =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                correctAnswerText.textContent =
+                    "To‘g‘ri javob: " +
+                    item.correctAnswer;
+
+
+                wrongCard.appendChild(
+                    wordTitle
+                );
+
+
+                wrongCard.appendChild(
+                    userAnswerText
+                );
+
+
+                wrongCard.appendChild(
+                    correctAnswerText
+                );
+
+
+                wrongWordsHTML +=
+                    wrongCard.outerHTML;
 
             }
         );
@@ -619,7 +894,9 @@ function finishQuiz() {
             </h1>
 
             <p>
-                ${quizSet.title}
+                ${escapeHTML(
+                    quizSet?.title || "Quiz"
+                )}
             </p>
 
         </div>
@@ -681,7 +958,7 @@ function finishQuiz() {
 
             <button
                 class="retry-button"
-                onclick="location.reload()"
+                id="retry-quiz-button"
             >
                 🔄 Qayta ishlash
             </button>
@@ -697,6 +974,46 @@ function finishQuiz() {
         </div>
 
     `;
+
+
+    /* =========================
+       QAYTA ISHLASH
+    ========================= */
+
+    const retryButton =
+        document.getElementById(
+            "retry-quiz-button"
+        );
+
+
+    if (retryButton) {
+
+        retryButton.addEventListener(
+            "click",
+            function () {
+
+                location.reload();
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================
+   HTML XAVFSIZLIGI
+========================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 
 }
 
