@@ -1,35 +1,163 @@
-const currentUser = sessionStorage.getItem("currentUser");
+/* =========================
+   LOGIN QILGAN USER
+========================= */
 
-// Login qilmagan foydalanuvchini login sahifasiga yuboramiz
-if (!currentUser) {
-    window.location.href = "login.html";
-} else {
+const currentUserData =
+    sessionStorage.getItem(
+        "currentUser"
+    );
 
-    const user = JSON.parse(currentUser);
 
-    // Foydalanuvchi ismi
-    document.getElementById("user-name").textContent = user.name;
+/* =========================
+   LOGIN TEKSHIRISH
+========================= */
 
-    document.getElementById("navbar-user-name").textContent =
-        user.name;
+if (!currentUserData) {
 
-    // Avatar
-    document.getElementById("user-avatar").textContent =
-        user.name.charAt(0).toUpperCase();
+    alert(
+        "Avval tizimga kiring!"
+    );
+
+    window.location.href =
+        "login.html";
+
+    throw new Error(
+        "User login qilmagan."
+    );
 }
 
 
-// Chiqish tugmasi
-const logoutButton = document.querySelector(".logout-btn");
+/* =========================
+   USER MA'LUMOTLARI
+========================= */
+
+let currentUser;
+
+try {
+
+    currentUser =
+        JSON.parse(
+            currentUserData
+        );
+
+} catch (error) {
+
+    console.error(
+        "currentUser ma'lumotlarini o‘qishda xatolik:",
+        error
+    );
+
+    sessionStorage.removeItem(
+        "currentUser"
+    );
+
+    alert(
+        "Sessiya ma'lumotlari buzilgan. Qaytadan kiring."
+    );
+
+    window.location.href =
+        "login.html";
+
+    throw new Error(
+        "currentUser JSON noto‘g‘ri."
+    );
+}
+
+
+/* =========================
+   USER ISMI
+========================= */
+
+const userNameElement =
+    document.getElementById(
+        "user-name"
+    );
+
+
+const navbarUserNameElement =
+    document.getElementById(
+        "navbar-user-name"
+    );
+
+
+const userAvatarElement =
+    document.getElementById(
+        "user-avatar"
+    );
+
+
+/* =========================
+   USER MA'LUMOTLARINI
+   SAHIFAGA CHIQARISH
+========================= */
+
+if (userNameElement) {
+
+    userNameElement.textContent =
+        currentUser.name;
+}
+
+
+if (navbarUserNameElement) {
+
+    navbarUserNameElement.textContent =
+        currentUser.name;
+}
+
+
+if (userAvatarElement) {
+
+    userAvatarElement.textContent =
+        currentUser.name
+            .charAt(0)
+            .toUpperCase();
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+const logoutButton =
+    document.querySelector(
+        ".logout-btn"
+    );
+
 
 if (logoutButton) {
-    logoutButton.addEventListener("click", function () {
 
-        // Login ma'lumotlarini o'chiramiz
-        sessionStorage.removeItem("currentUser");
+    logoutButton.addEventListener(
+        "click",
+        function () {
 
-        // Login sahifasiga qaytamiz
-        window.location.href = "login.html";
-    });
+            /* =========================
+               LOGIN MA'LUMOTLARINI
+               O‘CHIRISH
+            ========================= */
+
+            sessionStorage.removeItem(
+                "currentUser"
+            );
+
+
+            /* =========================
+               LOGIN SAHIFASIGA
+            ========================= */
+
+            window.location.href =
+                "login.html";
+
+        }
+    );
+
 }
 
+
+/* =========================
+   DEBUG
+========================= */
+
+console.log(
+    "Dashboard user:",
+    currentUser
+);
