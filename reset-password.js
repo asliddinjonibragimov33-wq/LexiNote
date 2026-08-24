@@ -16,6 +16,14 @@ const resetMessage =
 
 
 /* =========================
+   BACKEND URL
+========================= */
+
+const API_URL =
+    "https://lexinote-backend.onrender.com";
+
+
+/* =========================
    RESET TOKEN
 ========================= */
 
@@ -32,176 +40,214 @@ if (!resetToken) {
     window.location.href =
         "recovery.html";
 
+    throw new Error(
+        "Reset token topilmadi."
+    );
 }
 
 
 /* =========================
-   FORM
+   FORM TEKSHIRISH
 ========================= */
 
-resetForm.addEventListener(
-    "submit",
-    async function (event) {
+if (!resetForm) {
 
-        event.preventDefault();
+    console.error(
+        "reset-password-form topilmadi!"
+    );
 
-
-        const password =
-            newPassword.value;
-
-        const confirm =
-            confirmPassword.value;
+} else {
 
 
-        /* =========================
-           BO‘SH MAYDON
-        ========================= */
+    /* =========================
+       FORM
+    ========================= */
 
-        if (!password || !confirm) {
+    resetForm.addEventListener(
+        "submit",
+        async function (event) {
 
-            resetMessage.textContent =
-                "Barcha maydonlarni to‘ldiring.";
-
-            return;
-
-        }
-
-
-        /* =========================
-           PAROL UZUNLIGI
-        ========================= */
-
-        if (password.length < 6) {
-
-            resetMessage.textContent =
-                "Parol kamida 6 ta belgidan iborat bo‘lishi kerak.";
-
-            return;
-
-        }
-
-
-        /* =========================
-           PAROLLARNI TEKSHIRISH
-        ========================= */
-
-        if (password !== confirm) {
-
-            resetMessage.textContent =
-                "Parollar bir xil emas.";
-
-            return;
-
-        }
-
-
-        try {
-
-            const response =
-                await fetch(
-                    "https://lexinote-backend.onrender.com/reset-password",
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-
-                            reset_token:
-                                resetToken,
-
-                            new_password:
-                                password
-
-                        })
-                    }
-                );
-
-
-            const data =
-                await response.json();
-
-
-            console.log(
-                "Reset password backend javobi:",
-                data
-            );
+            event.preventDefault();
 
 
             /* =========================
-               XATO
+               INPUTLAR
             ========================= */
 
-            if (!response.ok) {
+            const password =
+                newPassword.value;
+
+
+            const confirm =
+                confirmPassword.value;
+
+
+            /* =========================
+               BO‘SH MAYDONLAR
+            ========================= */
+
+            if (
+                !password ||
+                !confirm
+            ) {
 
                 resetMessage.textContent =
-                    data.error ||
-                    "Parolni yangilashda xatolik yuz berdi.";
+                    "Barcha maydonlarni to‘ldiring.";
 
                 return;
+            }
+
+
+            /* =========================
+               PAROL UZUNLIGI
+            ========================= */
+
+            if (
+                password.length < 6
+            ) {
+
+                resetMessage.textContent =
+                    "Parol kamida 6 ta belgidan iborat bo‘lishi kerak.";
+
+                return;
+            }
+
+
+            /* =========================
+               PAROLLARNI TEKSHIRISH
+            ========================= */
+
+            if (
+                password !==
+                confirm
+            ) {
+
+                resetMessage.textContent =
+                    "Parollar bir xil emas.";
+
+                return;
+            }
+
+
+            /* =========================
+               BACKENDGA SO‘ROV
+            ========================= */
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_URL}/reset-password`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                reset_token:
+                                    resetToken,
+
+                                new_password:
+                                    password
+
+                            })
+                        }
+                    );
+
+
+                /* =========================
+                   BACKEND JAVOBI
+                ========================= */
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Reset password backend javobi:",
+                    data
+                );
+
+
+                /* =========================
+                   XATO
+                ========================= */
+
+                if (!response.ok) {
+
+                    resetMessage.textContent =
+                        data.error ||
+                        "Parolni yangilashda xatolik yuz berdi.";
+
+                    return;
+                }
+
+
+                /* =========================
+                   MUVAFFAQIYAT
+                ========================= */
+
+                resetMessage.textContent =
+                    "✓ Parol muvaffaqiyatli yangilandi!";
+
+
+                /* =========================
+                   RESET MA'LUMOTLARINI
+                   TOZALASH
+                ========================= */
+
+                sessionStorage.removeItem(
+                    "resetToken"
+                );
+
+                sessionStorage.removeItem(
+                    "verifiedContact"
+                );
+
+                sessionStorage.removeItem(
+                    "resetContact"
+                );
+
+
+                /* =========================
+                   LOGIN SAHIFASI
+                ========================= */
+
+                setTimeout(
+                    function () {
+
+                        window.location.href =
+                            "login.html";
+
+                    },
+                    1000
+                );
 
             }
 
 
             /* =========================
-               MUVAFFAQIYAT
+               SERVER XATOSI
             ========================= */
 
-            resetMessage.textContent =
-                "✓ Parol muvaffaqiyatli yangilandi!";
+            catch (error) {
+
+                console.error(
+                    "Reset password xatosi:",
+                    error
+                );
 
 
-            /* =========================
-               RESET MA'LUMOTLARINI
-               TOZALASH
-            ========================= */
+                resetMessage.textContent =
+                    "Server bilan bog‘lanib bo‘lmadi!";
 
-            sessionStorage.removeItem(
-                "resetToken"
-            );
-
-            sessionStorage.removeItem(
-                "verifiedContact"
-            );
-
-            sessionStorage.removeItem(
-                "resetContact"
-            );
-
-
-            /* =========================
-               LOGIN
-            ========================= */
-
-            setTimeout(
-                function () {
-
-                    window.location.href =
-                        "login.html";
-
-                },
-                1000
-            );
+            }
 
         }
+    );
 
-
-        catch (error) {
-
-            console.error(
-                "Reset password xatosi:",
-                error
-            );
-
-
-            resetMessage.textContent =
-                "Server bilan bog‘lanib bo‘lmadi!";
-
-        }
-
-    }
-);
-
+}
