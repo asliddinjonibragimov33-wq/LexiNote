@@ -1,52 +1,224 @@
-const registerForm = document.getElementById("registerForm");
+/* =========================
+   REGISTER FORM
+========================= */
 
-registerForm.addEventListener("submit", async function (event) {
-    event.preventDefault();
+const registerForm =
+    document.getElementById("registerForm");
 
-    const name = document.getElementById("name").value.trim();
-    const contact = document.getElementById("contact").value.trim();
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value;
-    const confirmPassword =
-        document.getElementById("confirm-password").value;
 
-    // Parollarni tekshirish
-    if (password !== confirmPassword) {
-        alert("Parollar bir xil emas!");
-        return;
-    }
+/* =========================
+   BACKEND URL
+========================= */
 
-    try {
-        const response = await fetch(
-            "https://lexinote-backend.onrender.com/register",
-            {
-                method: "POST",
+const API_URL =
+    "https://lexinote-backend.onrender.com";
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
 
-                body: JSON.stringify({
-                    name: name,
-                    contact: contact,
-                    username: username,
-                    password: password
-                })
-            }
-        );
+/* =========================
+   REGISTER
+========================= */
 
-        const result = await response.json();
+registerForm.addEventListener(
+    "submit",
+    async function (event) {
 
-        if (response.ok) {
-            alert("Ro'yxatdan o'tish muvaffaqiyatli!");
+        event.preventDefault();
 
-            console.log(result);
-        } else {
-            alert(result.error);
+
+        /* =========================
+           INPUTLAR
+        ========================= */
+
+        const name =
+            document
+                .getElementById("name")
+                .value
+                .trim();
+
+
+        const contact =
+            document
+                .getElementById("contact")
+                .value
+                .trim();
+
+
+        const username =
+            document
+                .getElementById("username")
+                .value
+                .trim();
+
+
+        const password =
+            document
+                .getElementById("password")
+                .value;
+
+
+        const confirmPassword =
+            document
+                .getElementById("confirm-password")
+                .value;
+
+
+        /* =========================
+           BO‘SH MAYDONLAR
+        ========================= */
+
+        if (
+            !name ||
+            !contact ||
+            !username ||
+            !password ||
+            !confirmPassword
+        ) {
+
+            alert(
+                "Iltimos, barcha maydonlarni to‘ldiring!"
+            );
+
+            return;
         }
 
-    } catch (error) {
-        console.error(error);
-        alert("Server bilan bog'lanib bo'lmadi!");
+
+        /* =========================
+           PAROLNI TEKSHIRISH
+        ========================= */
+
+        if (
+            password !==
+            confirmPassword
+        ) {
+
+            alert(
+                "Parollar bir xil emas!"
+            );
+
+            return;
+        }
+
+
+        /* =========================
+           PAROL UZUNLIGI
+        ========================= */
+
+        if (
+            password.length < 6
+        ) {
+
+            alert(
+                "Parol kamida 6 ta belgidan iborat bo‘lishi kerak!"
+            );
+
+            return;
+        }
+
+
+        /* =========================
+           BACKENDGA SO‘ROV
+        ========================= */
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/register`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            name:
+                                name,
+
+                            contact:
+                                contact,
+
+                            username:
+                                username,
+
+                            password:
+                                password
+
+                        })
+                    }
+                );
+
+
+            /* =========================
+               BACKEND JAVOBI
+            ========================= */
+
+            const result =
+                await response.json();
+
+
+            console.log(
+                "Register backend javobi:",
+                result
+            );
+
+
+            /* =========================
+               MUVAFFAQIYAT
+            ========================= */
+
+            if (response.ok) {
+
+                alert(
+                    "Ro'yxatdan o'tish muvaffaqiyatli!"
+                );
+
+
+                /* =========================
+                   LOGIN SAHIFASIGA
+                ========================= */
+
+                window.location.href =
+                    "login.html";
+
+            }
+
+
+            /* =========================
+               XATO
+            ========================= */
+
+            else {
+
+                alert(
+                    result.error ||
+                    "Ro'yxatdan o'tishda xatolik yuz berdi!"
+                );
+
+            }
+
+        }
+
+
+        /* =========================
+           SERVER XATOSI
+        ========================= */
+
+        catch (error) {
+
+            console.error(
+                "Register xatosi:",
+                error
+            );
+
+
+            alert(
+                "Server bilan bog‘lanib bo‘lmadi!"
+            );
+
+        }
+
     }
-});
+);
