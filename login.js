@@ -18,7 +18,7 @@ loginForm.addEventListener("submit", async function (event) {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:5000/login",
+            "https://lexinote-backend.onrender.com/login",
             {
                 method: "POST",
 
