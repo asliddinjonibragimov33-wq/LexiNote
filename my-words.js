@@ -42,7 +42,7 @@ async function loadSets() {
 
         const response =
             await fetch(
-                `http://127.0.0.1:5000/sets?user_id=${currentUser.id}`
+                `https://lexinote-backend.onrender.com/sets?user_id=${currentUser.id}`
             );
 
         console.log(
@@ -213,7 +213,7 @@ function displaySets(savedSets) {
 
                     const response =
                         await fetch(
-                            `http://127.0.0.1:5000/sets/${set.id}`,
+                            `https://lexinote-backend.onrender.com/sets/${set.id}`,
                             {
                                 method: "DELETE"
                             }
