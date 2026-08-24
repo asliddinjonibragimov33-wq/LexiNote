@@ -42,7 +42,7 @@ if (!recoveryForm) {
 
                 const response =
                     await fetch(
-                        "http://127.0.0.1:5000/forgot-password",
+                        "https://lexinote-backend.onrender.com/forgot-password",
                         {
                             method: "POST",
 
