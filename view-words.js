@@ -1,28 +1,55 @@
+console.log("VIEW-WORDS JS ISHLADI!");
+
+
 /* =========================
-   SET ID
+   BACKEND URL
 ========================= */
 
-const selectedSetId =
-    localStorage.getItem("selectedSetId");
+const API_URL =
+    "https://lexinote-backend.onrender.com";
 
 
 /* =========================
    LOGIN QILGAN USER
 ========================= */
 
+const currentUser =
+    JSON.parse(
+        sessionStorage.getItem("currentUser")
+    );
+
+
 if (!currentUser) {
 
-    alert("Avval tizimga kiring!");
+    alert(
+        "Avval tizimga kiring!"
+    );
 
     window.location.href =
         "login.html";
 
+    throw new Error(
+        "User login qilmagan."
+    );
+
 }
 
 
+console.log(
+    "View words user:",
+    currentUser
+);
+
+
 /* =========================
-   SET ID TEKSHIRISH
+   SET ID
 ========================= */
+
+const selectedSetId =
+    localStorage.getItem(
+        "selectedSetId"
+    );
+
 
 if (!selectedSetId) {
 
@@ -33,6 +60,10 @@ if (!selectedSetId) {
     window.location.href =
         "my-words.html";
 
+    throw new Error(
+        "selectedSetId topilmadi."
+    );
+
 }
 
 
@@ -41,16 +72,49 @@ if (!selectedSetId) {
 ========================= */
 
 const viewDate =
-    document.getElementById("view-date");
+    document.getElementById(
+        "view-date"
+    );
+
 
 const viewTitle =
-    document.getElementById("view-title");
+    document.getElementById(
+        "view-title"
+    );
+
 
 const viewCount =
-    document.getElementById("view-count");
+    document.getElementById(
+        "view-count"
+    );
+
 
 const wordsList =
-    document.getElementById("view-words-list");
+    document.getElementById(
+        "view-words-list"
+    );
+
+
+/* =========================
+   ELEMENTLARNI TEKSHIRISH
+========================= */
+
+if (
+    !viewDate ||
+    !viewTitle ||
+    !viewCount ||
+    !wordsList
+) {
+
+    console.error(
+        "View words elementlaridan biri topilmadi."
+    );
+
+    throw new Error(
+        "HTML elementlari topilmadi."
+    );
+
+}
 
 
 /* =========================
@@ -59,12 +123,45 @@ const wordsList =
 
 async function loadSet() {
 
+    console.log(
+        "Set yuklanmoqda:",
+        selectedSetId
+    );
+
+
+    /* =========================
+       LOADING
+    ========================= */
+
+    wordsList.innerHTML = `
+
+        <div class="empty-words">
+
+            <span>
+                📖
+            </span>
+
+            <p>
+                Lug‘atlar yuklanmoqda...
+            </p>
+
+        </div>
+
+    `;
+
+
     try {
 
         const response =
             await fetch(
-                `https://lexinote-backend.onrender.com/sets/${selectedSetId}/words?user_id=${currentUser.id}`
+                `${API_URL}/sets/${encodeURIComponent(selectedSetId)}/words?user_id=${encodeURIComponent(currentUser.id)}`
             );
+
+
+        console.log(
+            "View words response:",
+            response
+        );
 
 
         const data =
@@ -77,6 +174,10 @@ async function loadSet() {
         );
 
 
+        /* =========================
+           BACKEND XATOSI
+        ========================= */
+
         if (!response.ok) {
 
             alert(
@@ -88,6 +189,25 @@ async function loadSet() {
                 "my-words.html";
 
             return;
+
+        }
+
+
+        /* =========================
+           SET TEKSHIRISH
+        ========================= */
+
+        if (!data.set) {
+
+            alert(
+                "Lug‘at to‘plami topilmadi."
+            );
+
+            window.location.href =
+                "my-words.html";
+
+            return;
+
         }
 
 
@@ -106,8 +226,14 @@ async function loadSet() {
             data.set.title;
 
 
+        const words =
+            Array.isArray(data.words)
+                ? data.words
+                : [];
+
+
         viewCount.textContent =
-            data.words.length +
+            words.length +
             " ta lug‘at";
 
 
@@ -116,7 +242,7 @@ async function loadSet() {
         ========================= */
 
         displayWords(
-            data.words
+            words
         );
 
 
@@ -128,9 +254,44 @@ async function loadSet() {
         );
 
 
-        alert(
-            "Server bilan bog‘lanib bo‘lmadi!"
-        );
+        wordsList.innerHTML = `
+
+            <div class="empty-words">
+
+                <span>
+                    ⚠️
+                </span>
+
+                <p>
+                    Server bilan bog‘lanib bo‘lmadi.
+                </p>
+
+                <button
+                    type="button"
+                    id="retry-load-set"
+                >
+                    🔄 Qayta urinish
+                </button>
+
+            </div>
+
+        `;
+
+
+        const retryButton =
+            document.getElementById(
+                "retry-load-set"
+            );
+
+
+        if (retryButton) {
+
+            retryButton.addEventListener(
+                "click",
+                loadSet
+            );
+
+        }
 
     }
 
@@ -146,7 +307,14 @@ function displayWords(words) {
     wordsList.innerHTML = "";
 
 
-    if (words.length === 0) {
+    /* =========================
+       BO‘SH SET
+    ========================= */
+
+    if (
+        !Array.isArray(words) ||
+        words.length === 0
+    ) {
 
         wordsList.innerHTML = `
 
@@ -165,12 +333,20 @@ function displayWords(words) {
 
         `;
 
+        viewCount.textContent =
+            "0 ta lug‘at";
+
         return;
+
     }
 
 
+    /* =========================
+       SO‘ZLAR
+    ========================= */
+
     words.forEach(
-        function(item, index) {
+        function (item, index) {
 
             const wordCard =
                 document.createElement(
@@ -191,13 +367,13 @@ function displayWords(words) {
 
                 <div class="view-word-content">
 
-                    <h2>
-                        ${item.word}
+                    <h2 class="word-title">
+                        ${escapeHTML(item.word)}
                     </h2>
 
 
-                    <h3>
-                        ${item.translation}
+                    <h3 class="word-translation">
+                        ${escapeHTML(item.translation)}
                     </h3>
 
 
@@ -206,7 +382,7 @@ function displayWords(words) {
                         ?
                         `
                         <p class="word-definition">
-                            ${item.definition}
+                            ${escapeHTML(item.definition)}
                         </p>
                         `
                         :
@@ -219,7 +395,7 @@ function displayWords(words) {
                         ?
                         `
                         <p class="word-example">
-                            ${item.example}
+                            ${escapeHTML(item.example)}
                         </p>
                         `
                         :
@@ -232,16 +408,20 @@ function displayWords(words) {
                 <div class="view-word-actions">
 
                     <button
+                        type="button"
                         class="edit-word-button"
                         title="Lug‘atni tahrirlash"
+                        aria-label="Lug‘atni tahrirlash"
                     >
                         ✏️
                     </button>
 
 
                     <button
+                        type="button"
                         class="delete-word-button"
                         title="Lug‘atni o‘chirish"
+                        aria-label="Lug‘atni o‘chirish"
                     >
                         🗑️
                     </button>
@@ -263,7 +443,7 @@ function displayWords(words) {
 
             editButton.addEventListener(
                 "click",
-                function(event) {
+                function (event) {
 
                     event.stopPropagation();
 
@@ -299,7 +479,7 @@ function displayWords(words) {
 
             deleteButton.addEventListener(
                 "click",
-                async function(event) {
+                async function (event) {
 
                     event.stopPropagation();
 
@@ -311,18 +491,27 @@ function displayWords(words) {
 
 
                     if (!confirmed) {
+
                         return;
+
                     }
+
+
+                    /* =========================
+                       BUTTON HOLATI
+                    ========================= */
+
+                    deleteButton.disabled =
+                        true;
 
 
                     try {
 
                         const response =
                             await fetch(
-                                `https://lexinote-backend.onrender.com/words/${item.id}`,
+                                `${API_URL}/words/${encodeURIComponent(item.id)}`,
                                 {
-                                    method:
-                                        "DELETE"
+                                    method: "DELETE"
                                 }
                             );
 
@@ -331,6 +520,16 @@ function displayWords(words) {
                             await response.json();
 
 
+                        console.log(
+                            "Delete word response:",
+                            data
+                        );
+
+
+                        /* =========================
+                           XATO
+                        ========================= */
+
                         if (!response.ok) {
 
                             alert(
@@ -338,16 +537,29 @@ function displayWords(words) {
                                 "So‘zni o‘chirishda xatolik!"
                             );
 
+                            deleteButton.disabled =
+                                false;
+
                             return;
+
                         }
 
 
+                        /* =========================
+                           MUVAFFAQIYAT
+                        ========================= */
+
                         alert(
-                            data.message
+                            data.message ||
+                            "So‘z muvaffaqiyatli o‘chirildi!"
                         );
 
 
-                        loadSet();
+                        /* =========================
+                           RO‘YXATNI YANGILASH
+                        ========================= */
+
+                        await loadSet();
 
 
                     } catch (error) {
@@ -362,6 +574,10 @@ function displayWords(words) {
                             "Server bilan bog‘lanib bo‘lmadi!"
                         );
 
+
+                        deleteButton.disabled =
+                            false;
+
                     }
 
                 }
@@ -375,6 +591,36 @@ function displayWords(words) {
         }
     );
 
+
+    /* =========================
+       COUNT
+    ========================= */
+
+    viewCount.textContent =
+        words.length +
+        " ta lug‘at";
+
+}
+
+
+/* =========================
+   HTML XAVFSIZLIGI
+========================= */
+
+function escapeHTML(value) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        value ?? "";
+
+
+    return div.innerHTML;
+
 }
 
 
@@ -384,8 +630,24 @@ function displayWords(words) {
 
 function formatDate(date) {
 
+    if (!date) {
+
+        return "—";
+
+    }
+
+
     const parts =
         date.split("-");
+
+
+    if (
+        parts.length !== 3
+    ) {
+
+        return date;
+
+    }
 
 
     return (
