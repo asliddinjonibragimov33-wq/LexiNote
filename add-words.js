@@ -1,7 +1,16 @@
-const currentSet = JSON.parse(
-    localStorage.getItem("currentSet")
-);
+/* =========================
+   CURRENT SET
+========================= */
 
+const currentSet =
+    JSON.parse(
+        localStorage.getItem("currentSet")
+    );
+
+
+/* =========================
+   SETNI TEKSHIRISH
+========================= */
 
 if (!currentSet) {
 
@@ -13,14 +22,8 @@ if (!currentSet) {
         "add-word.html";
 
     throw new Error(
-        "currentSet mavjud emas"
+        "currentSet mavjud emas."
     );
-}
-if (!currentSet) {
-
-    alert("Lug‘at to‘plami topilmadi.");
-
-    window.location.href = "add-word.html";
 
 }
 
@@ -35,11 +38,22 @@ const setDate =
 const setTitle =
     document.getElementById("set-title");
 
-setDate.textContent =
-    "📅 " + formatDate(currentSet.date);
 
-setTitle.textContent =
-    currentSet.title;
+if (setDate) {
+
+    setDate.textContent =
+        "📅 " +
+        formatDate(currentSet.date);
+
+}
+
+
+if (setTitle) {
+
+    setTitle.textContent =
+        currentSet.title;
+
+}
 
 
 /* =========================
@@ -56,24 +70,54 @@ const wordCount =
     document.getElementById("word-count");
 
 const saveSetButton =
-    document.getElementById("save-set-button");
+    document.getElementById(
+        "save-set-button"
+    );
 
 
 /* =========================
-   SO‘Z MAYDONLARI
+   INPUTLAR
 ========================= */
 
 const wordInput =
     document.getElementById("word");
 
 const translationInput =
-    document.getElementById("translation");
+    document.getElementById(
+        "translation"
+    );
 
 const definitionInput =
-    document.getElementById("definition");
+    document.getElementById(
+        "definition"
+    );
 
 const exampleInput =
-    document.getElementById("example");
+    document.getElementById(
+        "example"
+    );
+
+
+/* =========================
+   ELEMENTLARNI TEKSHIRISH
+========================= */
+
+if (
+    !wordForm ||
+    !wordsList ||
+    !wordCount ||
+    !saveSetButton ||
+    !wordInput ||
+    !translationInput ||
+    !definitionInput ||
+    !exampleInput
+) {
+
+    console.error(
+        "add-words.html elementlaridan biri topilmadi."
+    );
+
+}
 
 
 /* =========================
@@ -84,6 +128,14 @@ let words = [];
 
 
 /* =========================
+   BACKEND URL
+========================= */
+
+const API_URL =
+    "https://lexinote-backend.onrender.com";
+
+
+/* =========================
    BACKENDDAN SO‘ZLARNI OLISH
 ========================= */
 
@@ -91,16 +143,21 @@ async function loadWords() {
 
     try {
 
-        const response = await fetch(
-            `https://lexinote-backend.onrender.com/sets/${currentSet.id}/words`
-        );
+        const response =
+            await fetch(
+                `${API_URL}/sets/${currentSet.id}/words`
+            );
 
-        const data = await response.json();
+
+        const data =
+            await response.json();
+
 
         console.log(
             "Backenddan kelgan so‘zlar:",
             data
         );
+
 
         if (!response.ok) {
 
@@ -110,11 +167,18 @@ async function loadWords() {
             );
 
             return;
+
         }
 
-        words = data.words;
+
+        words =
+            Array.isArray(data.words)
+                ? data.words
+                : [];
+
 
         displayWords();
+
 
     } catch (error) {
 
@@ -123,10 +187,13 @@ async function loadWords() {
             error
         );
 
+
         alert(
             "Server bilan bog‘lanib bo‘lmadi!"
         );
+
     }
+
 }
 
 
@@ -134,111 +201,147 @@ async function loadWords() {
    SO‘Z QO‘SHISH
 ========================= */
 
-wordForm.addEventListener(
-    "submit",
-    async function(event) {
+if (wordForm) {
 
-        event.preventDefault();
+    wordForm.addEventListener(
+        "submit",
+        async function (event) {
 
-        const word =
-            wordInput.value.trim();
-
-        const translation =
-            translationInput.value.trim();
-
-        const definition =
-            definitionInput.value.trim();
-
-        const example =
-            exampleInput.value.trim();
+            event.preventDefault();
 
 
-        if (!word || !translation) {
+            const word =
+                wordInput.value.trim();
 
-            alert(
-                "Iltimos, so‘z va tarjimasini kiriting."
-            );
+            const translation =
+                translationInput.value.trim();
 
-            return;
-        }
+            const definition =
+                definitionInput.value.trim();
 
-
-        try {
-
-            const response = await fetch(
-                `https://lexinote-backend.onrender.com/sets/${currentSet.id}/words`,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        word: word,
-                        translation: translation,
-                        definition: definition,
-                        example: example
-                    })
-                }
-            );
-
-
-            const data =
-                await response.json();
-
-
-            console.log(
-                "So‘z qo‘shish javobi:",
-                data
-            );
-
-
-            if (!response.ok) {
-
-                alert(
-                    data.error ||
-                    "So‘zni saqlashda xatolik!"
-                );
-
-                return;
-            }
+            const example =
+                exampleInput.value.trim();
 
 
             /* =========================
-               BACKENDDAN QAYTGAN SO‘Z
+               TEKSHIRISH
             ========================= */
 
-            words.push(
-                data.word
-            );
+            if (
+                !word ||
+                !translation
+            ) {
+
+                alert(
+                    "Iltimos, so‘z va tarjimasini kiriting."
+                );
+
+                return;
+
+            }
 
 
-            displayWords();
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_URL}/sets/${currentSet.id}/words`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                word:
+                                    word,
+
+                                translation:
+                                    translation,
+
+                                definition:
+                                    definition,
+
+                                example:
+                                    example
+
+                            })
+
+                        }
+                    );
 
 
-            wordForm.reset();
+                const data =
+                    await response.json();
 
 
-            alert(
-                "So‘z muvaffaqiyatli saqlandi!"
-            );
+                console.log(
+                    "So‘z qo‘shish javobi:",
+                    data
+                );
 
 
-        } catch (error) {
+                /* =========================
+                   XATOLIK
+                ========================= */
 
-            console.error(
-                "Add word error:",
-                error
-            );
+                if (!response.ok) {
 
-            alert(
-                "Server bilan bog‘lanib bo‘lmadi!"
-            );
+                    alert(
+                        data.error ||
+                        "So‘zni saqlashda xatolik!"
+                    );
+
+                    return;
+
+                }
+
+
+                /* =========================
+                   YANGI SO‘Z
+                ========================= */
+
+                if (data.word) {
+
+                    words.push(
+                        data.word
+                    );
+
+                }
+
+
+                displayWords();
+
+
+                wordForm.reset();
+
+
+                alert(
+                    "So‘z muvaffaqiyatli saqlandi!"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Add word error:",
+                    error
+                );
+
+
+                alert(
+                    "Server bilan bog‘lanib bo‘lmadi!"
+                );
+
+            }
+
         }
+    );
 
-    }
-);
+}
 
 
 /* =========================
@@ -247,8 +350,17 @@ wordForm.addEventListener(
 
 function displayWords() {
 
+    if (!wordsList) {
+        return;
+    }
+
+
     wordsList.innerHTML = "";
 
+
+    /* =========================
+       BO‘SH HOLAT
+    ========================= */
 
     if (words.length === 0) {
 
@@ -269,17 +381,30 @@ function displayWords() {
 
         `;
 
-        wordCount.textContent = "0";
+
+        if (wordCount) {
+
+            wordCount.textContent =
+                "0";
+
+        }
 
         return;
+
     }
 
 
+    /* =========================
+       SO‘ZLAR
+    ========================= */
+
     words.forEach(
-        function(item, index) {
+        function (item) {
 
             const wordElement =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             wordElement.className =
@@ -328,6 +453,7 @@ function displayWords() {
                 <div class="word-item-actions">
 
                     <button
+                        type="button"
                         class="delete-word"
                         onclick="deleteWord(${item.id})"
                     >
@@ -347,8 +473,13 @@ function displayWords() {
     );
 
 
-    wordCount.textContent =
-        words.length;
+    if (wordCount) {
+
+        wordCount.textContent =
+            words.length;
+
+    }
+
 }
 
 
@@ -373,7 +504,7 @@ async function deleteWord(wordId) {
 
         const response =
             await fetch(
-                `https://lexinote-backend.onrender.com/words/${wordId}`,
+                `${API_URL}/words/${wordId}`,
                 {
                     method: "DELETE"
                 }
@@ -384,6 +515,12 @@ async function deleteWord(wordId) {
             await response.json();
 
 
+        console.log(
+            "So‘zni o‘chirish javobi:",
+            data
+        );
+
+
         if (!response.ok) {
 
             alert(
@@ -392,13 +529,23 @@ async function deleteWord(wordId) {
             );
 
             return;
+
         }
 
 
+        /* =========================
+           LOCAL RO‘YXATNI YANGILASH
+        ========================= */
+
         words =
             words.filter(
-                function(item) {
-                    return item.id !== wordId;
+                function (item) {
+
+                    return (
+                        item.id !==
+                        wordId
+                    );
+
                 }
             );
 
@@ -407,7 +554,8 @@ async function deleteWord(wordId) {
 
 
         alert(
-            data.message
+            data.message ||
+            "So‘z o‘chirildi!"
         );
 
 
@@ -418,10 +566,13 @@ async function deleteWord(wordId) {
             error
         );
 
+
         alert(
             "Server bilan bog‘lanib bo‘lmadi!"
         );
+
     }
+
 }
 
 
@@ -429,30 +580,35 @@ async function deleteWord(wordId) {
    SAQLASH
 ========================= */
 
-saveSetButton.addEventListener(
-    "click",
-    function() {
+if (saveSetButton) {
 
-        if (words.length === 0) {
+    saveSetButton.addEventListener(
+        "click",
+        function () {
+
+            if (words.length === 0) {
+
+                alert(
+                    "Avval kamida bitta lug‘at qo‘shing."
+                );
+
+                return;
+
+            }
+
 
             alert(
-                "Avval kamida bitta lug‘at qo‘shing."
+                "Lug‘atlar muvaffaqiyatli saqlandi!"
             );
 
-            return;
+
+            window.location.href =
+                "my-words.html";
+
         }
+    );
 
-
-        alert(
-            "Lug‘atlar muvaffaqiyatli saqlandi!"
-        );
-
-
-        window.location.href =
-            "my-words.html";
-
-    }
-);
+}
 
 
 /* =========================
@@ -461,8 +617,18 @@ saveSetButton.addEventListener(
 
 function formatDate(date) {
 
+    if (!date) {
+        return "";
+    }
+
+
     const parts =
         date.split("-");
+
+
+    if (parts.length !== 3) {
+        return date;
+    }
 
 
     return (
@@ -472,6 +638,7 @@ function formatDate(date) {
         "." +
         parts[0]
     );
+
 }
 
 
