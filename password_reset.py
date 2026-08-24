@@ -1,4 +1,3 @@
-
 from flask import Blueprint, request
 from werkzeug.security import generate_password_hash
 
@@ -32,47 +31,6 @@ password_reset = Blueprint(
     "password_reset",
     __name__
 )
-
-
-# ==========================================
-# RESET CODES TABLE
-# ==========================================
-
-def create_reset_table():
-
-    connection = get_database()
-
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS password_resets (
-
-            id SERIAL PRIMARY KEY,
-
-            user_id INTEGER NOT NULL,
-
-            code TEXT NOT NULL,
-
-            reset_token TEXT,
-
-            expires_at TIMESTAMP NOT NULL,
-
-            verified INTEGER DEFAULT 0,
-
-            created_at TIMESTAMP
-                DEFAULT CURRENT_TIMESTAMP,
-
-            FOREIGN KEY (user_id)
-                REFERENCES users(id)
-                ON DELETE CASCADE
-        )
-    """)
-
-    connection.commit()
-
-    cursor.close()
-    connection.close()
-
 
 # ==========================================
 # EMAIL YUBORISH
