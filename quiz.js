@@ -116,7 +116,7 @@ async function loadQuiz() {
 
         const response =
             await fetch(
-                `http://127.0.0.1:5000/sets/${quizSetId}/words?user_id=${quizUser.id}`
+                `https://lexinote-backend.onrender.com/sets/${quizSetId}/words?user_id=${quizUser.id}`
             );
 
 
