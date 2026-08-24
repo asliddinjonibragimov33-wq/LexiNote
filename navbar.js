@@ -1,3 +1,7 @@
+/* =========================
+   CURRENT USER
+========================= */
+
 const currentUser = JSON.parse(
     sessionStorage.getItem("currentUser")
 );
@@ -16,7 +20,7 @@ if (!currentUser) {
 } else {
 
     /* =========================
-       ISM
+       FOYDALANUVCHI ISMI
     ========================= */
 
     const userName =
@@ -72,10 +76,14 @@ if (!currentUser) {
                 }
 
 
+                /* Login ma'lumotlarini o'chirish */
+
                 sessionStorage.removeItem(
                     "currentUser"
                 );
 
+
+                /* Login sahifasiga qaytish */
 
                 window.location.href =
                     "login.html";
