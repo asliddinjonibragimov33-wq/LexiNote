@@ -1,16 +1,16 @@
 console.log("MY-WORDS JS ISHLADI!");
 
-/* =========================
+/* =====================================================
    BACKEND URL
-========================= */
+===================================================== */
 
 const API_URL =
     "https://lexinote-backend.onrender.com";
 
 
-/* =========================
+/* =====================================================
    ELEMENTLAR
-========================= */
+===================================================== */
 
 const setsList =
     document.getElementById("sets-list");
@@ -19,25 +19,29 @@ const setsList =
 if (!setsList) {
 
     console.error(
-        "sets-list elementi topilmadi!"
+        "❌ #sets-list elementi topilmadi!"
     );
 
     throw new Error(
-        "sets-list mavjud emas."
+        "#sets-list mavjud emas."
     );
 
 }
 
 
-/* =========================
-   LOGIN QILGAN USER
-========================= */
+/* =====================================================
+   CURRENT USER
+===================================================== */
 
 const currentUser =
     JSON.parse(
         sessionStorage.getItem("currentUser")
     );
 
+
+/* =====================================================
+   LOGIN TEKSHIRISH
+===================================================== */
 
 if (!currentUser) {
 
@@ -56,25 +60,54 @@ if (!currentUser) {
 
 
 console.log(
-    "Login qilgan user:",
+    "✅ Current user:",
     currentUser
 );
 
 
-/* =========================
-   SETLARNI BACKENDDAN OLISH
-========================= */
+/* =====================================================
+   USER ID TEKSHIRISH
+===================================================== */
+
+if (!currentUser.id) {
+
+    console.error(
+        "❌ currentUser ichida id mavjud emas:",
+        currentUser
+    );
+
+    alert(
+        "Foydalanuvchi ma'lumotlari noto'g'ri."
+    );
+
+    sessionStorage.removeItem(
+        "currentUser"
+    );
+
+    window.location.href =
+        "login.html";
+
+    throw new Error(
+        "User ID topilmadi."
+    );
+
+}
+
+
+/* =====================================================
+   SETLARNI YUKLASH
+===================================================== */
 
 async function loadSets() {
 
     console.log(
-        "loadSets() ishga tushdi!"
+        "📚 loadSets() boshlandi..."
     );
 
 
-    /* =========================
+    /* ---------------------------------------------
        LOADING
-    ========================= */
+    --------------------------------------------- */
 
     setsList.innerHTML = `
 
@@ -95,56 +128,125 @@ async function loadSets() {
 
     try {
 
-        const response =
-            await fetch(
-                `${API_URL}/sets?user_id=${encodeURIComponent(currentUser.id)}`
-            );
+        const url =
+            `${API_URL}/sets?user_id=${encodeURIComponent(currentUser.id)}`;
 
 
         console.log(
-            "Backend response:",
-            response
+            "🌐 Backend URL:",
+            url
         );
 
+
+        const response =
+            await fetch(url, {
+
+                method: "GET",
+
+                headers: {
+                    "Accept": "application/json"
+                }
+
+            });
+
+
+        console.log(
+            "📡 Backend status:",
+            response.status
+        );
+
+
+        /* ---------------------------------------------
+           RESPONSE JSON
+        --------------------------------------------- */
 
         const data =
             await response.json();
 
 
         console.log(
-            "Backend data:",
+            "📦 Backend data:",
             data
         );
 
 
-        /* =========================
+        /* ---------------------------------------------
            BACKEND XATOSI
-        ========================= */
+        --------------------------------------------- */
 
         if (!response.ok) {
 
-            alert(
-                data.error ||
-                "Lug‘atlarni yuklashda xatolik!"
+            console.error(
+                "❌ Backend error:",
+                data
             );
 
+
+            setsList.innerHTML = `
+
+                <div class="empty-sets">
+
+                    <div class="empty-icon">
+                        ⚠️
+                    </div>
+
+                    <h2>
+                        Lug‘atlarni yuklashda xatolik
+                    </h2>
+
+                    <p>
+                        ${
+                            escapeHTML(
+                                data.error ||
+                                "Server xatosi yuz berdi."
+                            )
+                        }
+                    </p>
+
+                    <button
+                        type="button"
+                        class="new-word-btn"
+                        id="retry-load-sets"
+                    >
+                        🔄 Qayta urinish
+                    </button>
+
+                </div>
+
+            `;
+
+
+            setupRetryButton();
+
             return;
+
         }
 
 
-        /* =========================
-           SETLARNI CHIQARISH
-        ========================= */
+        /* ---------------------------------------------
+           SETLAR
+        --------------------------------------------- */
+
+        const savedSets =
+            Array.isArray(data.sets)
+                ? data.sets
+                : [];
+
+
+        console.log(
+            `✅ ${savedSets.length} ta set topildi.`
+        );
+
 
         displaySets(
-            data.sets || []
+            savedSets
         );
 
 
     } catch (error) {
 
         console.error(
-            "Load sets error:",
+            "❌ loadSets() error:",
             error
         );
 
@@ -162,11 +264,12 @@ async function loadSets() {
                 </h2>
 
                 <p>
-                    Internet aloqangizni tekshirib,
-                    qaytadan urinib ko‘ring.
+                    Internet yoki backend serverni
+                    tekshirib, qaytadan urinib ko‘ring.
                 </p>
 
                 <button
+                    type="button"
                     class="new-word-btn"
                     id="retry-load-sets"
                 >
@@ -178,34 +281,47 @@ async function loadSets() {
         `;
 
 
-        const retryButton =
-            document.getElementById(
-                "retry-load-sets"
-            );
-
-
-        if (retryButton) {
-
-            retryButton.addEventListener(
-                "click",
-                loadSets
-            );
-
-        }
+        setupRetryButton();
 
     }
 
 }
 
 
-/* =========================
-   SETLARNI KO‘RSATISH
-========================= */
+/* =====================================================
+   RETRY BUTTON
+===================================================== */
 
-function displaySets(savedSets) {
+function setupRetryButton() {
+
+    const retryButton =
+        document.getElementById(
+            "retry-load-sets"
+        );
+
+
+    if (retryButton) {
+
+        retryButton.addEventListener(
+            "click",
+            loadSets
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SETLARNI KO‘RSATISH
+===================================================== */
+
+function displaySets(
+    savedSets
+) {
 
     console.log(
-        "displaySets():",
+        "🎨 displaySets():",
         savedSets
     );
 
@@ -213,12 +329,11 @@ function displaySets(savedSets) {
     setsList.innerHTML = "";
 
 
-    /* =========================
-       SETLAR YO‘Q
-    ========================= */
+    /* ---------------------------------------------
+       SET YO‘Q
+    --------------------------------------------- */
 
     if (
-        !Array.isArray(savedSets) ||
         savedSets.length === 0
     ) {
 
@@ -235,8 +350,8 @@ function displaySets(savedSets) {
                 </h2>
 
                 <p>
-                    Birinchi lug‘at
-                    to‘plamingizni yarating.
+                    Birinchi lug‘at to‘plamingizni
+                    yarating.
                 </p>
 
                 <a
@@ -251,12 +366,13 @@ function displaySets(savedSets) {
         `;
 
         return;
+
     }
 
 
-    /* =========================
-       SETLARNI CHIQARISH
-    ========================= */
+    /* ---------------------------------------------
+       SETLAR
+    --------------------------------------------- */
 
     savedSets.forEach(
         function (set) {
@@ -271,6 +387,10 @@ function displaySets(savedSets) {
                 "set-card";
 
 
+            /* -----------------------------------------
+               CARD HTML
+            ----------------------------------------- */
+
             card.innerHTML = `
 
                 <div class="set-card-icon">
@@ -281,7 +401,10 @@ function displaySets(savedSets) {
                 <div class="set-card-info">
 
                     <div class="set-card-date">
-                        📅 ${formatDate(set.date)}
+
+                        📅
+                        ${formatDate(set.date)}
+
                     </div>
 
 
@@ -291,8 +414,13 @@ function displaySets(savedSets) {
 
 
                     <p>
-                        ${Number(set.word_count) || 0}
+
+                        ${
+                            Number(set.word_count) || 0
+                        }
+
                         ta lug‘at
+
                     </p>
 
                 </div>
@@ -318,9 +446,9 @@ function displaySets(savedSets) {
             `;
 
 
-            /* =========================
-               O‘CHIRISH
-            ========================= */
+            /* -----------------------------------------
+               DELETE BUTTON
+            ----------------------------------------- */
 
             const deleteButton =
                 card.querySelector(
@@ -330,135 +458,54 @@ function displaySets(savedSets) {
 
             deleteButton.addEventListener(
                 "click",
-                async function (event) {
+                function (event) {
+
+                    event.preventDefault();
 
                     event.stopPropagation();
 
 
-                    const confirmed =
-                        confirm(
-                            `"${set.title}" lug‘at to‘plamini o‘chirishni xohlaysizmi?`
-                        );
-
-
-                    if (!confirmed) {
-
-                        return;
-
-                    }
-
-
-                    /* =========================
-                       DELETE BUTTON HOLATI
-                    ========================= */
-
-                    deleteButton.disabled =
-                        true;
-
-
-                    try {
-
-                        const response =
-                            await fetch(
-                                `${API_URL}/sets/${set.id}`,
-                                {
-                                    method: "DELETE"
-                                }
-                            );
-
-
-                        const data =
-                            await response.json();
-
-
-                        console.log(
-                            "Delete set response:",
-                            data
-                        );
-
-
-                        if (!response.ok) {
-
-                            alert(
-                                data.error ||
-                                "Lug‘atni o‘chirishda xatolik!"
-                            );
-
-                            deleteButton.disabled =
-                                false;
-
-                            return;
-                        }
-
-
-                        alert(
-                            data.message ||
-                            "Lug‘at muvaffaqiyatli o‘chirildi!"
-                        );
-
-
-                        /* =========================
-                           TANLANGAN SETNI TOZALASH
-                        ========================= */
-
-                        const selectedSetId =
-                            localStorage.getItem(
-                                "selectedSetId"
-                            );
-
-
-                        if (
-                            String(selectedSetId) ===
-                            String(set.id)
-                        ) {
-
-                            localStorage.removeItem(
-                                "selectedSetId"
-                            );
-
-                        }
-
-
-                        /* =========================
-                           RO‘YXATNI YANGILASH
-                        ========================= */
-
-                        await loadSets();
-
-
-                    } catch (error) {
-
-                        console.error(
-                            "Delete set error:",
-                            error
-                        );
-
-
-                        alert(
-                            "Server bilan bog‘lanib bo‘lmadi!"
-                        );
-
-
-                        deleteButton.disabled =
-                            false;
-
-                    }
+                    deleteSet(
+                        set,
+                        deleteButton
+                    );
 
                 }
             );
 
 
-            /* =========================
-               SETNI OCHISH
-            ========================= */
+            /* -----------------------------------------
+               CARD CLICK
+            ----------------------------------------- */
 
             card.addEventListener(
                 "click",
                 function () {
 
+                    console.log(
+                        "📖 Tanlangan set:",
+                        set
+                    );
+
+
+                    /*
+                     * view-words.html uchun
+                     */
+
                     localStorage.setItem(
                         "selectedSetId",
-                        set.id
+                        String(set.id)
+                    );
+
+
+                    /*
+                     * Quiz uchun ham
+                     * keyinchalik kerak bo‘lishi mumkin
+                     */
+
+                    localStorage.setItem(
+                        "quizSetId",
+                        String(set.id)
                     );
 
 
@@ -479,11 +526,190 @@ function displaySets(savedSets) {
 }
 
 
-/* =========================
-   SANANI FORMATLASH
-========================= */
+/* =====================================================
+   SETNI O‘CHIRISH
+===================================================== */
 
-function formatDate(date) {
+async function deleteSet(
+    set,
+    deleteButton
+) {
+
+    const confirmed =
+        confirm(
+            `"${set.title}" lug‘at to‘plamini o‘chirishni xohlaysizmi?`
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    /* ---------------------------------------------
+       BUTTON DISABLED
+    --------------------------------------------- */
+
+    deleteButton.disabled =
+        true;
+
+
+    deleteButton.textContent =
+        "⏳";
+
+
+    try {
+
+        const url =
+            `${API_URL}/sets/${set.id}`;
+
+
+        console.log(
+            "🗑️ DELETE:",
+            url
+        );
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "DELETE",
+
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "🗑️ Delete response:",
+            data
+        );
+
+
+        /* ---------------------------------------------
+           DELETE XATOSI
+        --------------------------------------------- */
+
+        if (!response.ok) {
+
+            alert(
+                data.error ||
+                "Lug‘atni o‘chirishda xatolik yuz berdi."
+            );
+
+
+            deleteButton.disabled =
+                false;
+
+
+            deleteButton.textContent =
+                "🗑️";
+
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           LOCAL STORAGE TOZALASH
+        --------------------------------------------- */
+
+        const selectedSetId =
+            localStorage.getItem(
+                "selectedSetId"
+            );
+
+
+        const quizSetId =
+            localStorage.getItem(
+                "quizSetId"
+            );
+
+
+        if (
+            String(selectedSetId) ===
+            String(set.id)
+        ) {
+
+            localStorage.removeItem(
+                "selectedSetId"
+            );
+
+        }
+
+
+        if (
+            String(quizSetId) ===
+            String(set.id)
+        ) {
+
+            localStorage.removeItem(
+                "quizSetId"
+            );
+
+        }
+
+
+        /* ---------------------------------------------
+           MUVAFFAQIYAT
+        --------------------------------------------- */
+
+        alert(
+            data.message ||
+            "Lug‘at muvaffaqiyatli o‘chirildi!"
+        );
+
+
+        /* ---------------------------------------------
+           RO‘YXATNI QAYTA YUKLASH
+        --------------------------------------------- */
+
+        await loadSets();
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Delete set error:",
+            error
+        );
+
+
+        alert(
+            "Server bilan bog‘lanib bo‘lmadi!"
+        );
+
+
+        deleteButton.disabled =
+            false;
+
+
+        deleteButton.textContent =
+            "🗑️";
+
+    }
+
+}
+
+
+/* =====================================================
+   SANANI FORMATLASH
+===================================================== */
+
+function formatDate(
+    date
+) {
 
     if (!date) {
 
@@ -492,13 +718,19 @@ function formatDate(date) {
     }
 
 
+    const dateString =
+        String(date);
+
+
     const parts =
-        date.split("-");
+        dateString.split("-");
 
 
-    if (parts.length !== 3) {
+    if (
+        parts.length !== 3
+    ) {
 
-        return date;
+        return dateString;
 
     }
 
@@ -514,11 +746,13 @@ function formatDate(date) {
 }
 
 
-/* =========================
+/* =====================================================
    XAVFSIZ HTML
-========================= */
+===================================================== */
 
-function escapeHTML(value) {
+function escapeHTML(
+    value
+) {
 
     const div =
         document.createElement(
@@ -535,8 +769,8 @@ function escapeHTML(value) {
 }
 
 
-/* =========================
-   BOSHLASH
-========================= */
+/* =====================================================
+   START
+===================================================== */
 
 loadSets();
