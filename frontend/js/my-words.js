@@ -9,7 +9,7 @@ const API_URL =
 
 
 /* =====================================================
-   ELEMENTLAR
+   ELEMENT
 ===================================================== */
 
 const setsList =
@@ -19,11 +19,11 @@ const setsList =
 if (!setsList) {
 
     console.error(
-        "❌ #sets-list elementi topilmadi!"
+        "sets-list elementi topilmadi!"
     );
 
     throw new Error(
-        "#sets-list mavjud emas."
+        "sets-list mavjud emas."
     );
 
 }
@@ -31,9 +31,12 @@ if (!setsList) {
 
 /* =====================================================
    CURRENT USER
+   MUHIM:
+   navbar.js bilan nom to'qnashmasligi uchun
+   myWordsUser ishlatyapmiz.
 ===================================================== */
 
-const currentUser =
+const myWordsUser =
     JSON.parse(
         sessionStorage.getItem("currentUser")
     );
@@ -43,7 +46,7 @@ const currentUser =
    LOGIN TEKSHIRISH
 ===================================================== */
 
-if (!currentUser) {
+if (!myWordsUser) {
 
     alert(
         "Avval tizimga kiring!"
@@ -60,8 +63,8 @@ if (!currentUser) {
 
 
 console.log(
-    "✅ Current user:",
-    currentUser
+    "My Words User:",
+    myWordsUser
 );
 
 
@@ -69,11 +72,11 @@ console.log(
    USER ID TEKSHIRISH
 ===================================================== */
 
-if (!currentUser.id) {
+if (!myWordsUser.id) {
 
     console.error(
-        "❌ currentUser ichida id mavjud emas:",
-        currentUser
+        "User ID topilmadi:",
+        myWordsUser
     );
 
     alert(
@@ -88,26 +91,26 @@ if (!currentUser.id) {
         "login.html";
 
     throw new Error(
-        "User ID topilmadi."
+        "User ID mavjud emas."
     );
 
 }
 
 
 /* =====================================================
-   SETLARNI YUKLASH
+   SETLARNI BACKENDDAN OLISH
 ===================================================== */
 
 async function loadSets() {
 
     console.log(
-        "📚 loadSets() boshlandi..."
+        "loadSets() ishga tushdi!"
     );
 
 
-    /* ---------------------------------------------
+    /* =================================================
        LOADING
-    --------------------------------------------- */
+    ================================================= */
 
     setsList.innerHTML = `
 
@@ -129,58 +132,50 @@ async function loadSets() {
     try {
 
         const url =
-            `${API_URL}/sets?user_id=${encodeURIComponent(currentUser.id)}`;
+            `${API_URL}/sets?user_id=${encodeURIComponent(myWordsUser.id)}`;
 
 
         console.log(
-            "🌐 Backend URL:",
+            "Backend URL:",
             url
         );
 
 
         const response =
-            await fetch(url, {
+            await fetch(
+                url,
+                {
+                    method: "GET",
 
-                method: "GET",
-
-                headers: {
-                    "Accept": "application/json"
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    }
                 }
-
-            });
+            );
 
 
         console.log(
-            "📡 Backend status:",
+            "Backend status:",
             response.status
         );
 
-
-        /* ---------------------------------------------
-           RESPONSE JSON
-        --------------------------------------------- */
 
         const data =
             await response.json();
 
 
         console.log(
-            "📦 Backend data:",
+            "Backend data:",
             data
         );
 
 
-        /* ---------------------------------------------
+        /* =================================================
            BACKEND XATOSI
-        --------------------------------------------- */
+        ================================================= */
 
         if (!response.ok) {
-
-            console.error(
-                "❌ Backend error:",
-                data
-            );
-
 
             setsList.innerHTML = `
 
@@ -191,14 +186,14 @@ async function loadSets() {
                     </div>
 
                     <h2>
-                        Lug‘atlarni yuklashda xatolik
+                        Xatolik yuz berdi
                     </h2>
 
                     <p>
                         ${
                             escapeHTML(
                                 data.error ||
-                                "Server xatosi yuz berdi."
+                                "Lug‘atlarni yuklashda xatolik."
                             )
                         }
                     </p>
@@ -223,9 +218,9 @@ async function loadSets() {
         }
 
 
-        /* ---------------------------------------------
+        /* =================================================
            SETLAR
-        --------------------------------------------- */
+        ================================================= */
 
         const savedSets =
             Array.isArray(data.sets)
@@ -234,7 +229,8 @@ async function loadSets() {
 
 
         console.log(
-            `✅ ${savedSets.length} ta set topildi.`
+            "Topilgan setlar:",
+            savedSets
         );
 
 
@@ -246,7 +242,7 @@ async function loadSets() {
     } catch (error) {
 
         console.error(
-            "❌ loadSets() error:",
+            "loadSets error:",
             error
         );
 
@@ -264,8 +260,8 @@ async function loadSets() {
                 </h2>
 
                 <p>
-                    Internet yoki backend serverni
-                    tekshirib, qaytadan urinib ko‘ring.
+                    Internet aloqangizni tekshiring
+                    va qaytadan urinib ko‘ring.
                 </p>
 
                 <button
@@ -289,7 +285,7 @@ async function loadSets() {
 
 
 /* =====================================================
-   RETRY BUTTON
+   RETRY
 ===================================================== */
 
 function setupRetryButton() {
@@ -320,18 +316,12 @@ function displaySets(
     savedSets
 ) {
 
-    console.log(
-        "🎨 displaySets():",
-        savedSets
-    );
-
-
     setsList.innerHTML = "";
 
 
-    /* ---------------------------------------------
-       SET YO‘Q
-    --------------------------------------------- */
+    /* =================================================
+       SETLAR YO‘Q
+    ================================================= */
 
     if (
         savedSets.length === 0
@@ -370,9 +360,9 @@ function displaySets(
     }
 
 
-    /* ---------------------------------------------
-       SETLAR
-    --------------------------------------------- */
+    /* =================================================
+       SETLARNI CHIQARISH
+    ================================================= */
 
     savedSets.forEach(
         function (set) {
@@ -387,16 +377,11 @@ function displaySets(
                 "set-card";
 
 
-            /* -----------------------------------------
-               CARD HTML
-            ----------------------------------------- */
-
             card.innerHTML = `
 
                 <div class="set-card-icon">
                     📚
                 </div>
-
 
                 <div class="set-card-info">
 
@@ -407,24 +392,18 @@ function displaySets(
 
                     </div>
 
-
                     <h2>
                         ${escapeHTML(set.title)}
                     </h2>
 
-
                     <p>
-
                         ${
                             Number(set.word_count) || 0
                         }
-
                         ta lug‘at
-
                     </p>
 
                 </div>
-
 
                 <button
                     type="button"
@@ -434,7 +413,6 @@ function displaySets(
                 >
                     🗑️
                 </button>
-
 
                 <div
                     class="set-card-arrow"
@@ -446,9 +424,9 @@ function displaySets(
             `;
 
 
-            /* -----------------------------------------
+            /* =================================================
                DELETE BUTTON
-            ----------------------------------------- */
+            ================================================= */
 
             const deleteButton =
                 card.querySelector(
@@ -474,34 +452,25 @@ function displaySets(
             );
 
 
-            /* -----------------------------------------
-               CARD CLICK
-            ----------------------------------------- */
+            /* =================================================
+               SETNI OCHISH
+            ================================================= */
 
             card.addEventListener(
                 "click",
                 function () {
 
                     console.log(
-                        "📖 Tanlangan set:",
-                        set
+                        "Tanlangan set:",
+                        set.id
                     );
 
-
-                    /*
-                     * view-words.html uchun
-                     */
 
                     localStorage.setItem(
                         "selectedSetId",
                         String(set.id)
                     );
 
-
-                    /*
-                     * Quiz uchun ham
-                     * keyinchalik kerak bo‘lishi mumkin
-                     */
 
                     localStorage.setItem(
                         "quizSetId",
@@ -548,10 +517,6 @@ async function deleteSet(
     }
 
 
-    /* ---------------------------------------------
-       BUTTON DISABLED
-    --------------------------------------------- */
-
     deleteButton.disabled =
         true;
 
@@ -562,19 +527,9 @@ async function deleteSet(
 
     try {
 
-        const url =
-            `${API_URL}/sets/${set.id}`;
-
-
-        console.log(
-            "🗑️ DELETE:",
-            url
-        );
-
-
         const response =
             await fetch(
-                url,
+                `${API_URL}/sets/${set.id}`,
                 {
                     method: "DELETE",
 
@@ -591,39 +546,33 @@ async function deleteSet(
 
 
         console.log(
-            "🗑️ Delete response:",
+            "Delete response:",
             data
         );
 
-
-        /* ---------------------------------------------
-           DELETE XATOSI
-        --------------------------------------------- */
 
         if (!response.ok) {
 
             alert(
                 data.error ||
-                "Lug‘atni o‘chirishda xatolik yuz berdi."
+                "Lug‘atni o‘chirishda xatolik!"
             );
 
 
             deleteButton.disabled =
                 false;
 
-
             deleteButton.textContent =
                 "🗑️";
-
 
             return;
 
         }
 
 
-        /* ---------------------------------------------
+        /* =================================================
            LOCAL STORAGE TOZALASH
-        --------------------------------------------- */
+        ================================================= */
 
         const selectedSetId =
             localStorage.getItem(
@@ -661,19 +610,11 @@ async function deleteSet(
         }
 
 
-        /* ---------------------------------------------
-           MUVAFFAQIYAT
-        --------------------------------------------- */
-
         alert(
             data.message ||
             "Lug‘at muvaffaqiyatli o‘chirildi!"
         );
 
-
-        /* ---------------------------------------------
-           RO‘YXATNI QAYTA YUKLASH
-        --------------------------------------------- */
 
         await loadSets();
 
@@ -681,7 +622,7 @@ async function deleteSet(
     } catch (error) {
 
         console.error(
-            "❌ Delete set error:",
+            "Delete set error:",
             error
         );
 
@@ -693,7 +634,6 @@ async function deleteSet(
 
         deleteButton.disabled =
             false;
-
 
         deleteButton.textContent =
             "🗑️";
@@ -718,19 +658,15 @@ function formatDate(
     }
 
 
-    const dateString =
-        String(date);
-
-
     const parts =
-        dateString.split("-");
+        String(date).split("-");
 
 
     if (
         parts.length !== 3
     ) {
 
-        return dateString;
+        return String(date);
 
     }
 
