@@ -1,4 +1,6 @@
+```javascript
 console.log("MY-WORDS JS ISHLADI!");
+
 
 /* =====================================================
    BACKEND URL
@@ -14,6 +16,9 @@ const API_URL =
 
 const setsList =
     document.getElementById("sets-list");
+
+const searchInput =
+    document.getElementById("search-sets");
 
 
 if (!setsList) {
@@ -95,6 +100,13 @@ if (!myWordsUser.id) {
     );
 
 }
+
+
+/* =====================================================
+   🔍 QIDIRUV UCHUN BARCHA SETLAR
+===================================================== */
+
+let allSets = [];
 
 
 /* =====================================================
@@ -226,6 +238,13 @@ async function loadSets() {
             Array.isArray(data.sets)
                 ? data.sets
                 : [];
+
+
+        /* =================================================
+           🔍 QIDIRUV UCHUN SAQLAB QO‘YAMIZ
+        ================================================= */
+
+        allSets = savedSets;
 
 
         console.log(
@@ -496,6 +515,49 @@ function displaySets(
 
 
 /* =====================================================
+   🔍 LUG‘ATLARDAN QIDIRISH
+===================================================== */
+
+if (searchInput) {
+
+    searchInput.addEventListener(
+        "input",
+        function () {
+
+            const searchText =
+                searchInput.value
+                    .trim()
+                    .toLowerCase();
+
+
+            const filteredSets =
+                allSets.filter(
+                    function (set) {
+
+                        const title =
+                            String(
+                                set.title || ""
+                            ).toLowerCase();
+
+                        return title.includes(
+                            searchText
+                        );
+
+                    }
+                );
+
+
+            displaySets(
+                filteredSets
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
    SETNI O‘CHIRISH
 ===================================================== */
 
@@ -710,3 +772,4 @@ function escapeHTML(
 ===================================================== */
 
 loadSets();
+```
