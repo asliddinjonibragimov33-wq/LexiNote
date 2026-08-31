@@ -1,4 +1,3 @@
-```javascript
 console.log("MY-WORDS JS ISHLADI!");
 
 
@@ -772,4 +771,3 @@ function escapeHTML(
 ===================================================== */
 
 loadSets();
-```
