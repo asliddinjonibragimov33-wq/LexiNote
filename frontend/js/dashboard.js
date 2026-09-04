@@ -161,3 +161,81 @@ console.log(
     "Dashboard user:",
     currentUser
 );
+
+/* =========================
+   LEXINOTE STATISTIKASI
+========================= */
+const API_URL =
+    "https://lexinote-backend.onrender.com";
+
+async function loadStatistics() {
+    try {
+        const response =
+            await fetch(
+                `${API_URL}/statistics`
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Statistikani olishda xatolik."
+            );
+        }
+
+        const data =
+            await response.json();
+
+        /* =========================
+           FOYDALANUVCHILAR
+        ========================= */
+        const registeredUsers =
+            document.getElementById(
+                "registered-users"
+            );
+
+        if (registeredUsers) {
+
+            registeredUsers.textContent =
+                data.registered_users;
+        }
+
+        /* =========================
+           LUG‘ATLAR
+        ========================= */
+        const createdSets =
+            document.getElementById(
+                "created-sets"
+            );
+
+        if (createdSets) {
+            createdSets.textContent =
+                data.created_sets;
+        }
+
+        /* =========================
+           SO‘ZLAR
+        ========================= */
+        const savedWords =
+            document.getElementById(
+                "saved-words"
+            );
+
+        if (savedWords) {
+
+            savedWords.textContent =
+                Number(
+                    data.saved_words
+                ).toLocaleString(
+                    "en-US"
+                );
+        }
+       
+    } catch (error) {
+        console.error(
+            "Statistikani yuklashda xatolik:",
+            error
+        );
+    }
+}
+
+loadStatistics();
