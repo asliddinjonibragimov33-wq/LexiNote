@@ -970,6 +970,7 @@ def delete_set(set_id):
             "Lug'at muvaffaqiyatli o'chirildi!"
     }, 200
 
+
 # ==========================================
 # LEXINOTE STATISTICS
 # ==========================================
@@ -986,8 +987,7 @@ def get_statistics():
         FROM users
     """)
 
-    registered_users =
-        cursor.fetchone()["count"]
+    registered_users = cursor.fetchone()["count"]
 
     # =========================
     # YARATILGAN LUG‘ATLAR
@@ -997,8 +997,7 @@ def get_statistics():
         FROM sets
     """)
 
-    created_sets =
-        cursor.fetchone()["count"]
+    created_sets = cursor.fetchone()["count"]
 
     # =========================
     # SAQLANGAN SO‘ZLAR
@@ -1008,14 +1007,12 @@ def get_statistics():
         FROM words
     """)
 
-    saved_words =
-        cursor.fetchone()["count"]
+    saved_words = cursor.fetchone()["count"]
 
     cursor.close()
     connection.close()
 
     return {
-
         "registered_users":
             registered_users,
 
@@ -1026,7 +1023,7 @@ def get_statistics():
             saved_words
 
     }, 200
-    
+
 # ==========================================
 # START SERVER
 # ==========================================
