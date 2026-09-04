@@ -1341,3 +1341,104 @@ footer {
     }
 
 }
+
+/* =========================
+   LEXINOTE STATISTICS
+========================= */
+.statistics {
+    margin-top: 55px;
+}
+
+.statistics h2 {
+    margin-bottom: 25px;
+    color: #17213a;
+    font-size: 30px;
+}
+
+.statistics-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 25px;
+    background-color: white;
+    border: 1px solid #e1e6ef;
+    border-radius: 16px;
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.05);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background-color: #eaf1ff;
+    font-size: 28px;
+}
+
+.stat-card h3 {
+    margin: 0 0 5px;
+    color: #17213a;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.stat-card p {
+    margin: 0;
+    color: #52627c;
+    font-size: 15px;
+}
+
+
+/* =========================
+   STATISTICS RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+
+    .statistics-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 22px;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .statistics {
+        margin-top: 40px;
+    }
+
+    .statistics h2 {
+        font-size: 25px;
+    }
+
+    .stat-card h3 {
+        font-size: 26px;
+    }
+
+}
