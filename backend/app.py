@@ -970,7 +970,63 @@ def delete_set(set_id):
             "Lug'at muvaffaqiyatli o'chirildi!"
     }, 200
 
+# ==========================================
+# LEXINOTE STATISTICS
+# ==========================================
+@app.route("/statistics", methods=["GET"])
+def get_statistics():
+    connection = get_database()
+    cursor = connection.cursor()
 
+    # =========================
+    # RO‘YXATDAN O‘TGAN USERLAR
+    # =========================
+    cursor.execute("""
+        SELECT COUNT(*) AS count
+        FROM users
+    """)
+
+    registered_users =
+        cursor.fetchone()["count"]
+
+    # =========================
+    # YARATILGAN LUG‘ATLAR
+    # =========================
+    cursor.execute("""
+        SELECT COUNT(*) AS count
+        FROM sets
+    """)
+
+    created_sets =
+        cursor.fetchone()["count"]
+
+    # =========================
+    # SAQLANGAN SO‘ZLAR
+    # =========================
+    cursor.execute("""
+        SELECT COUNT(*) AS count
+        FROM words
+    """)
+
+    saved_words =
+        cursor.fetchone()["count"]
+
+    cursor.close()
+    connection.close()
+
+    return {
+
+        "registered_users":
+            registered_users,
+
+        "created_sets":
+            created_sets,
+
+        "saved_words":
+            saved_words
+
+    }, 200
+    
 # ==========================================
 # START SERVER
 # ==========================================
