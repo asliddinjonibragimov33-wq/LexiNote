@@ -289,39 +289,92 @@ footer {
     }
 }
 
+```css
+/* =========================
+   MOBILE NAVBAR
+========================= */
+
 @media (max-width: 700px) {
+
     .navbar {
-        height: auto;
-        padding: 20px;
-        flex-wrap: wrap;
-        gap: 20px;
+        height: 70px;
+        margin: 8px 10px 0;
+        padding: 0 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 0;
+        border-radius: 12px;
     }
 
-    .nav-center {
-        order: 3;
-        width: 100%;
-    }
-
-    .dashboard {
-        padding: 50px 20px;
-    }
-
-    .welcome h1 {
-        font-size: 34px;
-    }
-
-    .welcome p {
-        font-size: 18px;
-    }
-
-    .user-area {
+    /* =========================
+       LOGO
+    ========================= */
+    .logo {
         gap: 7px;
+        font-size: 21px;
+        white-space: nowrap;
     }
-    .username,
+
+    .logo-icon {
+        font-size: 23px;
+    }
+
+
+    /* =========================
+       BOSH SAHIFA
+    ========================= */
+    .nav-center {
+        display: none;
+    }
+
+
+    /* =========================
+       USER AREA
+    ========================= */
+    .user-area {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+    }
+
+
+    /* Avatar */
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+
+    /* Username */
+
+    .username {
+        display: none;
+    }
+
+
+    /* Dropdown */
+
     .dropdown-icon {
         display: none;
     }
+
+
+    /* =========================
+       CHIQISH BUTTON
+    ========================= */
+    .logout-btn {
+        padding: 8px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
 }
+
 /* =========================
    WORD PAGE
 ========================= */
