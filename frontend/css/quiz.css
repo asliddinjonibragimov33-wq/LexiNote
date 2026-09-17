@@ -929,19 +929,34 @@ body {
 
 
 /* =========================
-   TELEFON
+   STATISTICS RESPONSIVE
 ========================= */
+
+@media (max-width: 1000px) {
+
+    .statistics-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 22px;
+    }
+
+}
+
 
 @media (max-width: 600px) {
 
-    .question-row {
-        gap: 12px;
+    .statistics {
+        margin-top: 40px;
     }
 
-    .reverse-button {
-        width: 42px;
-        height: 42px;
-        font-size: 19px;
+    .statistics h2 {
+        font-size: 25px;
+    }
+
+    .stat-card h3 {
+        font-size: 26px;
     }
 
 }
