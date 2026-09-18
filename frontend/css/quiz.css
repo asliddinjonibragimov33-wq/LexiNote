@@ -929,34 +929,62 @@ body {
 
 
 /* =========================
-   STATISTICS RESPONSIVE
+   MOBILE NAVBAR
 ========================= */
 
-@media (max-width: 1000px) {
+@media (max-width: 700px) {
 
-    .statistics-cards {
-        grid-template-columns: 1fr;
+    .navbar {
+        height: 70px;
+        margin: 8px 10px 0;
+        padding: 0 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 0;
+        border-radius: 12px;
     }
 
-    .stat-card {
-        padding: 22px;
+    .logo {
+        gap: 7px;
+        font-size: 21px;
+        white-space: nowrap;
     }
 
-}
-
-
-@media (max-width: 600px) {
-
-    .statistics {
-        margin-top: 40px;
+    .logo-icon {
+        font-size: 23px;
     }
 
-    .statistics h2 {
-        font-size: 25px;
+    .nav-center {
+        display: none;
     }
 
-    .stat-card h3 {
-        font-size: 26px;
+    .user-area {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
     }
 
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .username {
+        display: none;
+    }
+
+    .dropdown-icon {
+        display: none;
+    }
+
+    .logout-btn {
+        padding: 8px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
 }
